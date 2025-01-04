@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27020:27017"
+    volumes:
+      - ./mongo_data:/data/db
+  unstructured:
+    image: downloads.unstructured.io/unstructured-io/unstructured-api:latest
+    platform: 'linux/amd64'
+    ports:
+      - "8000:8000"

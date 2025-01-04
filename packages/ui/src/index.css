@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        @apply bg-background;
+    }
+    *,
+    ::before,
+    ::after {
+        @apply border-border;
+        @apply text-text-primary;
+    }
+}
+
+:root {
+    --tw-color-primary: 37 84% 52%;
+    --tw-color-primary-light: 37 72% 68%;
+    --tw-color-primary-dark: 37 84% 40%;
+
+    --tw-color-secondary: 261 24% 60%;
+    --tw-color-secondary-light: 263 19% 76%;
+    --tw-color-secondary-dark: 263 20% 48%;
+
+    --tw-color-accent: 186 30% 48%;
+    --tw-color-background: 0 0% 96%;
+    --tw-color-surface: 0 0% 92%;
+    --tw-color-border: 0 0% 84%;
+
+    --tw-color-text-primary: 220 26% 14%;
+    --tw-color-text-secondary: 216 15% 52%;
+    --tw-color-text-muted: 214 20% 69%;
+
+    --tw-color-success: 148 48% 43%;
+    --tw-color-error: 0 76% 57%;
+    --tw-color-warning: 24 75% 50%;
+    --tw-color-info: 209 62% 50%;
+}

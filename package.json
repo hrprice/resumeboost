@@ -1,0 +1,14 @@
+{
+  "name": "resume_optimizer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "ui": "yarn workspace ui dev",
+    "api": "yarn workspace api start:dev"
+  }
+}

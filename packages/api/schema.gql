@@ -1,0 +1,20 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ParsedJobDescription {
+  jobTitle: String!
+  companyName: String!
+  location: String!
+  employmentType: String
+  responsibilities: [String!]
+  requirements: [String!]
+  preferredQualifications: [String!]
+  benefits: [String!]
+  keywords: [String!]
+}
+
+type Query {
+  getResumeText(resume: String!): String!
+  getParsedJobDescription(jobUrl: String!): ParsedJobDescription!
+}

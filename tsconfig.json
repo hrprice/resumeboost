@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
+    "paths": {
+      "@resume-optimizer/ui/*": ["./packages/ui/src/*"],
+    }
+  },
+  "exclude": ["**/node_modules"],
+  "watchOptions": {
+    "watchDirectory": "usefsevents",
+    "watchFile": "usefsevents",
+    "fallbackPolling": "dynamicPriority"
+  }
+}
