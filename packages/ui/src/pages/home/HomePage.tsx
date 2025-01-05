@@ -1,4 +1,4 @@
-import Text from "../../components/Text";
+import Text from "@resume-optimizer/ui/components/Text";
 
 const HomePage = () => {
   return (

@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../state/use-auth-context.tsx";
+import { useAuthContext } from "@resume-optimizer/ui/state/use-auth-context";
 import { useSnackbar } from "notistack";
 
 const LoginPage = () => {

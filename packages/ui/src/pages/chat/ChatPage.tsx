@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import UploadModal from "./components/UploadModal.tsx";
+import UploadModal from "@resume-optimizer/ui/pages/chat/components/UploadModal";
 import { useSnackbar } from "notistack";
-import axiosClient from "../../../axios-client.ts";
-import { ProgressCardStepEnum } from "./constants/chat-constants.ts";
+import axiosClient from "@resume-optimizer/ui/axios-client.ts";
+import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants.ts";
 import { io, Socket } from "socket.io-client";
-import ChatBox from "./components/ChatBox.tsx";
-import ResumeEditor from "./components/ResumeEditor.tsx";
+import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox.tsx";
+import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor.tsx";
+import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants.ts";
 
 const ChatPage = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -33,37 +34,38 @@ const ChatPage = () => {
       ]);
     const onAnalyzingComplete = () =>
       setCompletedSteps((prev) => [...prev, ProgressCardStepEnum.Analyzing]);
+    const onError = () => {
+      setError(true);
+    };
 
-    socket.on("resume.processingComplete", onResumeProcessingComplete);
     socket.on(
-      "jobDescription.processingComplete",
+      WebsocketEvents.Resume.ProcessingComplete,
+      onResumeProcessingComplete
+    );
+    socket.on(
+      WebsocketEvents.JobDescription.ProcessingComplete,
       onJobDescriptionProcessingComplete
     );
-    socket.on("analyzingComplete", onAnalyzingComplete);
-    socket.on("chat.chatBotMessage", (data) => console.log(data));
+    socket.on(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
+    socket.on(WebsocketEvents.Error.ConnectError, onError);
+    socket.on(WebsocketEvents.Error.Error, onError);
+    socket.on(WebsocketEvents.Error.ReconnectError, onError);
 
-    socket.on("connect_error", (error) => {
-      setError(true);
-      console.error("Connection error:", error.message);
-    });
-    socket.on("error", (error) => {
-      setError(true);
-      console.error("Socket error:", error);
-    });
-    socket.on("reconnect_error", (error) => {
-      setError(true);
-      console.error("Reconnection error:", error.message);
-    });
-    socket.onAny((event, ...args) => {
-      console.log(`Received event: ${event}`, args);
-    });
     return () => {
-      socket.off("resume.processingComplete", onResumeProcessingComplete);
       socket.off(
-        "jobDescription.processingComplete",
+        WebsocketEvents.Resume.ProcessingComplete,
+        onResumeProcessingComplete
+      );
+      socket.off(
+        WebsocketEvents.JobDescription.ProcessingComplete,
         onJobDescriptionProcessingComplete
       );
-      socket.off("analyzingComplete", onAnalyzingComplete);
+      socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
+      socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
+      socket.off(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
+      socket.off(WebsocketEvents.Error.ConnectError, onError);
+      socket.off(WebsocketEvents.Error.Error, onError);
+      socket.off(WebsocketEvents.Error.ReconnectError, onError);
       socket.close();
     };
   }, [socket]);
@@ -96,6 +98,7 @@ const ChatPage = () => {
           resumeId,
           jobUrl,
         },
+        reconnection: false,
       })
     );
   };

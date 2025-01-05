@@ -91,7 +91,7 @@ export class ChatService {
       { configurable: { thread_id: threadId } }
     );
 
-    websocket.emit('analyzingComplete');
+    websocket.emit('chat.analyzingComplete');
     websocket.emit('chat.chatBotMessage', initialRes.messages.at(-1)?.content);
 
     return async (message: string) => {

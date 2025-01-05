@@ -1,13 +1,13 @@
 import { DialogPanel, Dialog, DialogBackdrop } from "@headlessui/react";
-import Text from "../../../components/Text";
+import Text from "@resume-optimizer/ui/components/Text";
 import { useMemo, useRef } from "react";
 import Download from "@material-symbols/svg-400/rounded/download-fill.svg?react";
 import CheckIcon from "@material-symbols/svg-400/rounded/check_circle-fill.svg?react";
 import CancelIcon from "@material-symbols/svg-400/rounded/cancel-fill.svg?react";
 import { CircularProgress, Collapse } from "@mui/material";
 import { twMerge } from "tailwind-merge";
-import { ProgressCardStepEnum } from "../constants/chat-constants";
-import OnboardingCarousel from "./OnboardingCarousel";
+import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
+import OnboardingCarousel from "@resume-optimizer/ui/pages/chat/components/OnboardingCarousel";
 
 export interface ProgressCardProps {
   loading: boolean;

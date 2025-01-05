@@ -1,5 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
-import { BreakpointContext, ScreenSize } from "./breakpoint-context.tsx";
+import {
+  BreakpointContext,
+  ScreenSize,
+} from "@resume-optimizer/ui/state/breakpoint-context";
 
 const screenSizes: [number, ScreenSize][] = [
   [640, "sm"],

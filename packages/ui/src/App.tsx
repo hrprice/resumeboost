@@ -1,9 +1,9 @@
 import { SnackbarProvider } from "notistack";
-import AuthContextProvider from "./state/AuthContextProvider";
-import Routing from "./Routing";
+import AuthContextProvider from "@resume-optimizer/ui/state/AuthContextProvider";
+import Routing from "@resume-optimizer/ui/Routing";
 import { BrowserRouter } from "react-router-dom";
-import BreakpointProvider from "./state/BreakpointProvider";
-import NavBar from "./components/NavBar";
+import BreakpointProvider from "@resume-optimizer/ui/state/BreakpointProvider";
+import NavBar from "@resume-optimizer/ui/components/NavBar";
 
 const App = () => {
   return (

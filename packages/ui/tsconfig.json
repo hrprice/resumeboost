@@ -1,7 +1,33 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "experimentalDecorators": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "strictPropertyInitialization": false,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@resume-optimizer/ui/*": ["src/*"]
+    }
+  },
+  "watchOptions": {
+    "watchDirectory": "usefsevents",
+    "watchFile": "usefsevents",
+    "fallbackPolling": "dynamicPriority"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

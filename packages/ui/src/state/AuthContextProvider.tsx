@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   User,
 } from "firebase/auth";
-import { AuthContext } from "./auth-context";
+import { AuthContext } from "@resume-optimizer/ui/state/auth-context";
 
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +33,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       setUser(user);
     },
-    [auth],
+    [auth]
   );
 
   const logout = useCallback(async () => {

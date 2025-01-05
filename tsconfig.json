@@ -9,6 +9,8 @@
     "resolveJsonModule": true,
     "paths": {
       "@resume-optimizer/ui/*": ["./packages/ui/src/*"],
+      "@resume-optimizer/shared/*": ["./packages/shared/*"],
+      "@resume-optimizer/api/*": ["./packages/api/src/*"]
     }
   },
   "exclude": ["**/node_modules"],

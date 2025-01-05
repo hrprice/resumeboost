@@ -14,7 +14,7 @@
 
 - emitted by llm agent to close the chat session before closing the websocket connection
 
-`analyzingComplete`
+`chat.analyzingComplete`
 
 - emitted after initial llm invocation completes, before first chat message
 
@@ -23,6 +23,10 @@
 `resume.processingComplete`
 
 - emitted in `chatService.getChatbot()` after `resumeService.parseResumeText` completes
+
+`resume.update`
+
+- emitted by the llm agent to update a piece of the resume in find/replace format. data schema: {find: string, replace: string}
 
 #### Job Description Events
 

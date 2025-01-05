@@ -1,10 +1,10 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { ReactNode, useEffect } from "react";
-import { useAuthContext } from "./state/use-auth-context.tsx";
+import { useAuthContext } from "@resume-optimizer/ui/state/use-auth-context";
 import { Typography } from "@mui/material";
-import LoginPage from "./pages/Login.tsx";
-import HomePage from "./pages/home/HomePage.tsx";
-import ChatPage from "./pages/chat/ChatPage.tsx";
+import LoginPage from "@resume-optimizer/ui/pages/Login";
+import HomePage from "@resume-optimizer/ui/pages/home/HomePage";
+import ChatPage from "@resume-optimizer/ui/pages/chat/ChatPage";
 
 const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthContext();

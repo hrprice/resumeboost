@@ -1,4 +1,4 @@
-import Text from "./Text.tsx";
+import Text from "@resume-optimizer/ui/components/Text";
 
 const NavBar = () => {
   return (

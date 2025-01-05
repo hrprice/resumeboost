@@ -1,5 +1,8 @@
 import { useContext } from "react";
-import { BreakpointContext, ScreenSize } from "./breakpoint-context.tsx";
+import {
+  BreakpointContext,
+  ScreenSize,
+} from "@resume-optimizer/ui/state/breakpoint-context";
 
 const orderedScreenSizes: ScreenSize[] = ["sm", "md", "lg", "xl", "2xl"];
 
