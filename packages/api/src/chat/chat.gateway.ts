@@ -16,7 +16,7 @@ import { ResumePipe } from '../resume/resume.pipe';
 
 class ChatMessageDto {
   @IsString()
-  text: string;
+  message: string;
 }
 
 @WebSocketGateway({ cors: true })
@@ -52,7 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<void> {
     const message = plainToClass(ChatMessageDto, JSON.parse(data));
     this.logger.log(message);
-    const res = await this.chatBots[client.id](message.text);
-    this.server.sockets.sockets.get(client.id)?.emit('chat.chatBotMessage', { response: res });
+    const res = await this.chatBots[client.id](message.message);
+    this.server.sockets.sockets.get(client.id)?.emit('chat.chatBotMessage', { message: res });
   }
 }

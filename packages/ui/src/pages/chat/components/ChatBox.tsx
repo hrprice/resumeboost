@@ -4,7 +4,7 @@ import Text from "@resume-optimizer/ui/components/Text";
 import SendIcon from "@material-symbols/svg-400/rounded/arrow_circle_up-fill.svg?react";
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { Fade, Slide } from "@mui/material";
+import { Fade } from "@mui/material";
 
 type MessageType = "user" | "chatbot";
 
@@ -67,6 +67,7 @@ const MessagesDisplay = ({
     <div className="flex flex-col gap-2 w-full max-h-full">
       {messages.map((message) => (
         <div
+          key={message.content}
           className={classNames({
             "self-left": message.messageType === "chatbot",
             "self-end": message.messageType === "user",
@@ -86,18 +87,17 @@ const ChatBox = ({ socket }: { socket: Socket | undefined }) => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [currentMessage, setCurrentMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      content: "Hello, how can I assist you?",
-      messageType: "chatbot",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     if (!socket) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onChatBotMessage = (data: any) => {
-      console.log(data);
+    const onChatBotMessage = ({ message }: any) => {
+      setMessages((prev) => [
+        ...prev,
+        { content: message, messageType: "chatbot" },
+      ]);
+      setMessageLoading(false);
     };
     socket.on(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
 
@@ -106,28 +106,20 @@ const ChatBox = ({ socket }: { socket: Socket | undefined }) => {
     };
   }, [socket]);
 
-  const mockMessage = async () => {
-    const message = currentMessage;
+  const sendMessage = () => {
+    if (messageLoading || !inputRef.current || currentMessage === "") return;
+    inputRef.current.setSelectionRange(0, 0);
+    inputRef.current.focus();
+    setMessageLoading(true);
+    socket?.emit(
+      WebsocketEvents.Chat.UserMessage,
+      JSON.stringify({ message: currentMessage })
+    );
     setMessages((prev) => [
       ...prev,
       { content: currentMessage, messageType: "user" },
     ]);
     setCurrentMessage("");
-    setMessageLoading(true);
-    await (() => new Promise((resolve) => window.setTimeout(resolve, 3000)))();
-    setMessages((prev) => [
-      ...prev,
-      { content: message, messageType: "chatbot" },
-    ]);
-    setMessageLoading(false);
-  };
-
-  const sendMessage = () => {
-    if (messageLoading || !inputRef.current || currentMessage === "") return;
-    inputRef.current.setSelectionRange(0, 0);
-    inputRef.current.focus();
-    mockMessage();
-    // socket?.send(WebsocketEvents.Chat.UserMessage, { text: currentMessage });
   };
 
   return (

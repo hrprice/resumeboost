@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import UploadModal from "@resume-optimizer/ui/pages/chat/components/UploadModal";
 import { useSnackbar } from "notistack";
-import axiosClient from "@resume-optimizer/ui/axios-client.ts";
-import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants.ts";
+import axiosClient from "@resume-optimizer/ui/axios-client";
+import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
 import { io, Socket } from "socket.io-client";
-import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox.tsx";
-import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor.tsx";
-import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants.ts";
+import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox";
+import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
+import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
 
 const ChatPage = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(true);
   const [jobUrl, setJobUrl] = useState<string>("");
   const [completedSteps, setCompletedSteps] = useState<ProgressCardStepEnum[]>(
     []
@@ -51,6 +51,8 @@ const ChatPage = () => {
     socket.on(WebsocketEvents.Error.Error, onError);
     socket.on(WebsocketEvents.Error.ReconnectError, onError);
 
+    socket.on(WebsocketEvents.Resume.Update, (data) => console.log(data));
+
     return () => {
       socket.off(
         WebsocketEvents.Resume.ProcessingComplete,
@@ -62,7 +64,6 @@ const ChatPage = () => {
       );
       socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
       socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
-      socket.off(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
       socket.off(WebsocketEvents.Error.ConnectError, onError);
       socket.off(WebsocketEvents.Error.Error, onError);
       socket.off(WebsocketEvents.Error.ReconnectError, onError);

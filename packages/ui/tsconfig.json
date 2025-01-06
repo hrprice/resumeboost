@@ -20,7 +20,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@resume-optimizer/ui/*": ["src/*"]
+      "@resume-optimizer/ui/*": ["src/*"],
+      "@resume-optimizer/shared/*": ["../shared/*"]
     }
   },
   "watchOptions": {

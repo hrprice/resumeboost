@@ -92,7 +92,7 @@ export class ChatService {
     );
 
     websocket.emit('chat.analyzingComplete');
-    websocket.emit('chat.chatBotMessage', initialRes.messages.at(-1)?.content);
+    websocket.emit('chat.chatBotMessage', { message: initialRes.messages.at(-1)?.content });
 
     return async (message: string) => {
       const res = await app.invoke(
