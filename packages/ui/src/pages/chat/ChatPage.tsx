@@ -5,7 +5,9 @@ import axiosClient from "@resume-optimizer/ui/axios-client";
 import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
 import { io, Socket } from "socket.io-client";
 import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox";
-import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
+import ResumeEditor, {
+  ResumeUpdate,
+} from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
 import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
 
 const ChatPage = () => {
@@ -15,6 +17,7 @@ const ChatPage = () => {
   const [completedSteps, setCompletedSteps] = useState<ProgressCardStepEnum[]>(
     []
   );
+  const [resumeUpdates, setResumeUpdates] = useState<ResumeUpdate[]>([]);
   const [socket, setSocket] = useState<Socket>();
   const [error, setError] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -37,6 +40,9 @@ const ChatPage = () => {
     const onError = () => {
       setError(true);
     };
+    const onResumeUpdate = (data: ResumeUpdate) => {
+      setResumeUpdates((prev) => [...prev, data]);
+    };
 
     socket.on(
       WebsocketEvents.Resume.ProcessingComplete,
@@ -47,11 +53,11 @@ const ChatPage = () => {
       onJobDescriptionProcessingComplete
     );
     socket.on(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
+    socket.on(WebsocketEvents.Resume.Update, onResumeUpdate);
+
     socket.on(WebsocketEvents.Error.ConnectError, onError);
     socket.on(WebsocketEvents.Error.Error, onError);
     socket.on(WebsocketEvents.Error.ReconnectError, onError);
-
-    socket.on(WebsocketEvents.Resume.Update, (data) => console.log(data));
 
     return () => {
       socket.off(
@@ -67,6 +73,7 @@ const ChatPage = () => {
       socket.off(WebsocketEvents.Error.ConnectError, onError);
       socket.off(WebsocketEvents.Error.Error, onError);
       socket.off(WebsocketEvents.Error.ReconnectError, onError);
+      socket.off(WebsocketEvents.Resume.Update, onResumeUpdate);
       socket.close();
     };
   }, [socket]);
@@ -90,9 +97,7 @@ const ChatPage = () => {
   };
 
   const connectToSocket = (resumeId: string | undefined) => {
-    console.log(resumeId, jobUrl);
     if (!resumeId || !jobUrl) return;
-    console.log("connecting");
     setSocket(
       io(import.meta.env.VITE_BACKEND_URI, {
         query: {
@@ -127,8 +132,8 @@ const ChatPage = () => {
         close={() => setUploadModalOpen(false)}
       />
       <div className="h-full w-full flex bg-surface justify-center">
-        <div className="container bg-background border flex justify-between p-5 gap-5">
-          <ResumeEditor />
+        <div className="container h-full w-full bg-background border flex justify-between p-5 gap-5">
+          <ResumeEditor resumeUpdates={resumeUpdates} resumeFile={resumeFile} />
           <ChatBox socket={socket} />
         </div>
       </div>

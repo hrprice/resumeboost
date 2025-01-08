@@ -99,10 +99,13 @@ const ChatBox = ({ socket }: { socket: Socket | undefined }) => {
       ]);
       setMessageLoading(false);
     };
+    const onResumeUpdate = () => setMessageLoading(false);
     socket.on(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
+    socket.on(WebsocketEvents.Resume.Update, onResumeUpdate);
 
     return () => {
       socket.off(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
+      socket.off(WebsocketEvents.Resume.Update, onResumeUpdate);
     };
   }, [socket]);
 

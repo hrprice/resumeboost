@@ -3,12 +3,12 @@ import { ResumeService } from './resume.service';
 import { ResumePipe } from './resume.pipe';
 import { Resume } from './resume.model';
 
-@Resolver(() => String)
+@Resolver(() => Resume)
 export class ResumeResolver {
   constructor(private readonly resumeService: ResumeService) {}
 
-  @Query(() => String)
-  async getResumeText(@Args('resume', { type: () => String }, ResumePipe) resume: Resume): Promise<string> {
-    return this.resumeService.parseResumeText(resume);
+  @Query(() => Resume)
+  async getResume(@Args('resume', { type: () => String }, ResumePipe) resume: Resume): Promise<Resume> {
+    return resume;
   }
 }

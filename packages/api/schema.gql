@@ -2,6 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Resume {
+  _id: ID!
+  fileName: String!
+  size: Float!
+  mimeType: String!
+  textContent: String!
+}
+
 type ParsedJobDescription {
   jobTitle: String!
   companyName: String!
@@ -15,6 +23,6 @@ type ParsedJobDescription {
 }
 
 type Query {
-  getResumeText(resume: String!): String!
+  getResume(resume: String!): Resume!
   getParsedJobDescription(jobUrl: String!): ParsedJobDescription!
 }

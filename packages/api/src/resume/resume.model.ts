@@ -1,12 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 export type ResumeDocument = HydratedDocument<Resume>;
 
 @Schema()
 @ObjectType()
-@InputType()
 export class Resume {
   @Field(() => ID)
   _id: string;
@@ -22,6 +21,10 @@ export class Resume {
   @Prop()
   @Field(() => String)
   mimeType: string;
+
+  @Prop()
+  @Field(() => String)
+  textContent: string;
 }
 
 export const ResumeSchema = SchemaFactory.createForClass(Resume);
