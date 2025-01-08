@@ -231,7 +231,7 @@ const UploadModal = ({
   ];
 
   return (
-    <Dialog open={open} className="relative z-50 " onClose={() => {}}>
+    <Dialog open={open} className="relative z-50 " onClose={close}>
       <DialogBackdrop className="fixed inset-0 bg-secondary-dark/30 backdrop-blur-lg" />
       <div className="fixed inset-0 flex w-screen items-center justify-center">
         <DialogPanel className="relative w-[750px] h-[625px] border-2 border-primary-light bg-background rounded-[20px] p-2">

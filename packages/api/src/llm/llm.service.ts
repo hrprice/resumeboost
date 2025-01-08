@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Annotation, END, START, StateGraph } from '@langchain/langgraph';
 import { BaseMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatOpenAI } from '@langchain/openai';
-import { RESUME_SYSTEM_PROMPT } from '../../constants/resume-constants';
+import { RESUME_SYSTEM_PROMPT } from '../constants/resume-constants';
 import { z } from 'zod';
 
 @Injectable()

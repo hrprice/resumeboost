@@ -11,6 +11,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": { "@resume-optimizer/shared/*": ["../shared/*"] },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

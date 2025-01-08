@@ -10,7 +10,8 @@ import { tool } from '@langchain/core/tools';
 import { SendUpdateSchema } from './chat.dto';
 import { Socket } from 'socket.io';
 import { ToolNode, toolsCondition } from '@langchain/langgraph/prebuilt';
-import { CHATBOT_SYSTEM_PROMPT } from '../../constants/chatbot-constants';
+import { CHATBOT_SYSTEM_PROMPT } from '../constants/chatbot-constants';
+import { WebsocketEvents } from '@resume-optimizer/shared/socket-constants';
 
 export type ChatBot = (message: string) => Promise<MessageContent | null>;
 
@@ -24,9 +25,9 @@ export class ChatService {
 
   async getChatbot(threadId: string, resume: Resume, jobDescriptionUrl: string, websocket: Socket): Promise<ChatBot> {
     let resumeText = await this.resumeService.parseResumeText(resume);
-    websocket.emit('resume.processingComplete');
+    websocket.emit(WebsocketEvents.Resume.ProcessingComplete);
     const jobDescription = await this.jobDescriptionService.parseJobDescription(jobDescriptionUrl);
-    websocket.emit('jobDescription.processingComplete');
+    websocket.emit(WebsocketEvents.JobDescription.ProcessingComplete);
     const llm = new ChatOpenAI({
       model: this.configService.get('OPENAI_CHAT_MODEL', 'gpt-3.5-turbo'),
       apiKey: this.configService.getOrThrow('OPENAI_API_KEY')
@@ -39,12 +40,12 @@ export class ChatService {
     };
 
     const sendUpdate = async ({ find, replace }: { find: string; replace: string }): Promise<string> => {
-      websocket.emit('resume.update', { find, replace });
+      websocket.emit(WebsocketEvents.Resume.Update, { find, replace });
       return updateResume(resumeText, find, replace);
     };
 
     const endChat = async () => {
-      websocket.emit('chat.close');
+      websocket.emit(WebsocketEvents.Chat.Close);
       websocket.disconnect(true);
       return 'chat ended';
     };
@@ -91,8 +92,8 @@ export class ChatService {
       { configurable: { thread_id: threadId } }
     );
 
-    websocket.emit('chat.analyzingComplete');
-    websocket.emit('chat.chatBotMessage', { message: initialRes.messages.at(-1)?.content });
+    websocket.emit(WebsocketEvents.Chat.AnalyzingComplete);
+    websocket.emit(WebsocketEvents.Chat.ChatBotMessage, { message: initialRes.messages.at(-1)?.content });
 
     return async (message: string) => {
       const res = await app.invoke(

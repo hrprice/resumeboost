@@ -13,6 +13,7 @@ import { plainToClass } from '@nestjs/class-transformer';
 import { ChatBot, ChatService } from './chat.service';
 import { Logger } from '@nestjs/common';
 import { ResumePipe } from '../resume/resume.pipe';
+import { WebsocketEvents } from '@resume-optimizer/shared/socket-constants';
 
 class ChatMessageDto {
   @IsString()
@@ -48,11 +49,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     delete this.chatBots[client.id];
   }
 
-  @SubscribeMessage('chat.userMessage')
+  @SubscribeMessage(WebsocketEvents.Chat.UserMessage)
   async handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<void> {
     const message = plainToClass(ChatMessageDto, JSON.parse(data));
     this.logger.log(message);
     const res = await this.chatBots[client.id](message.message);
-    this.server.sockets.sockets.get(client.id)?.emit('chat.chatBotMessage', { message: res });
+    this.server.sockets.sockets.get(client.id)?.emit(WebsocketEvents.Chat.ChatBotMessage, { message: res });
   }
 }
