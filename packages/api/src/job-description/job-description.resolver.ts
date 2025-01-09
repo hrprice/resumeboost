@@ -10,4 +10,9 @@ export class JobDescriptionResolver {
   async getParsedJobDescription(@Args('jobUrl') jobUrl: string): Promise<ParsedJobDescription> {
     return this.jobDescriptionService.parseJobDescription(jobUrl);
   }
+
+  @Query(() => String)
+  async getJobDescriptionContent(@Args('jobUrl') jobUrl: string): Promise<string> {
+    return this.jobDescriptionService.getJobDescriptionHtml(jobUrl);
+  }
 }

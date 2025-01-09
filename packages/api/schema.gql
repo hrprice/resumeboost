@@ -25,4 +25,5 @@ type ParsedJobDescription {
 type Query {
   getResume(resume: String!): Resume!
   getParsedJobDescription(jobUrl: String!): ParsedJobDescription!
+  getJobDescriptionHtml(jobUrl: String!): String!
 }

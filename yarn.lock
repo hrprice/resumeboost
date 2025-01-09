@@ -2695,7 +2695,7 @@
   resolved "https://registry.yarnpkg.com/@kamilkisiela/fast-url-parser/-/fast-url-parser-1.1.4.tgz#9d68877a489107411b953c54ea65d0658b515809"
   integrity sha512-gbkePEBupNydxCelHCESvFSFM8XPh1Zs/OAVRW/rKpEqPAl5PbOM90Si8mv9bvnR53uPD2s/FiRxdvSejpRJew==
 
-"@langchain/community@^0.3.20":
+"@langchain/community@^0.3.22":
   version "0.3.22"
   resolved "https://registry.yarnpkg.com/@langchain/community/-/community-0.3.22.tgz#8c222e779b2bf1541cd8c037ec80d4fd0338a571"
   integrity sha512-RGfmG3sfJhVpdFHyPwdQhrzGXdGoCoBh6zWB79/4WaMVU0q0Uo1Y/NeeslSxp778sWEeJkRcXZC73dR8lwOFjw==
@@ -2711,7 +2711,7 @@
     zod "^3.22.3"
     zod-to-json-schema "^3.22.5"
 
-"@langchain/core@^0.3.26":
+"@langchain/core@^0.3.27":
   version "0.3.27"
   resolved "https://registry.yarnpkg.com/@langchain/core/-/core-0.3.27.tgz#b8e75bd4f122b18a423f3905df0e9872205a1a44"
   integrity sha512-jtJKbJWB1NPU1YvtrExOB2rumvUFgkJwlWGxyjSIV9A6zcLVmUbcZGV8fCSuXgl5bbzOIQLJ1xcLYQmbW9TkTg==
@@ -8761,6 +8761,11 @@ nestjs-firebase@^10.5.1:
   version "10.5.1"
   resolved "https://registry.yarnpkg.com/nestjs-firebase/-/nestjs-firebase-10.5.1.tgz#8b85e4936799ade38a7aaf6177dc416bc70fad2b"
   integrity sha512-b825zhuqPSM3LX2oUly/vkqOleL13uu3X/qD3qM0gNdD32niI2AX6/rQ35LDBgXJX3/mhDc4m7Cgpn3nvtP7hQ==
+
+nestjs-playwright@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/nestjs-playwright/-/nestjs-playwright-1.1.1.tgz#ebe365b1e83edb8b50c3fa155c500ee27a0b95bf"
+  integrity sha512-kL196xAqIxa7cDNV29SpFzl72E4MqWT2vQnpnnyF9ZtMcZYCSvKvHdyy08vjU4MPf2wj7BWZmMtxTsiAdvD3PA==
 
 nestjs-zod@^4.2.0:
   version "4.2.0"
