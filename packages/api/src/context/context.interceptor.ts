@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Context } from './context.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { GqlContextType } from '@nestjs/graphql';
 
 @Injectable()
 export class ContextInterceptor implements NestInterceptor {
@@ -12,8 +13,9 @@ export class ContextInterceptor implements NestInterceptor {
     private readonly userService: UserService
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+  intercept(ctx: ExecutionContext, next: CallHandler): Observable<any> {
+    const graphqlCtx = ctx.getType<GqlContextType>() === 'graphql';
+    const request = graphqlCtx ? ctx.getArgByIndex(2).req : ctx.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
     const token = authHeader?.split(' ')[1];
 

@@ -13,7 +13,7 @@ const ApolloProviderWrapper = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthContext();
 
   const httpLink = createHttpLink({
-    uri: import.meta.env.VITE_GRAPHQL_ENDPOINT,
+    uri: `${import.meta.env.VITE_BACKEND_URI}/graphql`,
   });
 
   const authLink = setContext(async (_, { headers }) => ({
