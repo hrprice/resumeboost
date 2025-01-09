@@ -60,6 +60,7 @@ const TextDisplay = ({
     <div className="bg-background w-full p-4" style={{ aspectRatio: 8.5 / 11 }}>
       {splitContent.map(({ content: textContent, type }) => (
         <Text
+          key={textContent.slice(10)}
           className={classNames(
             "whitespace-pre-wrap text-md transition-opacity",
             { "bg-accent/20": type === "updated" }
@@ -73,28 +74,12 @@ const TextDisplay = ({
 };
 
 const ResumeEditor = ({
-  resumeFile,
+  resumeText,
   resumeUpdates,
 }: {
-  resumeFile: File | null;
+  resumeText: string[] | undefined;
   resumeUpdates: ResumeUpdate[];
 }) => {
-  const [resumeText, setResumeText] = useState<string[]>();
-
-  useEffect(() => {
-    if (!resumeFile) return;
-    const getResumeBuffer = async () => {
-      const resumeBuffer = await resumeFile.arrayBuffer();
-      const PDFText = await getPDFText(Buffer.from(resumeBuffer)).then((text) =>
-        text.map((content) => content.replace(/●/g, "•"))
-      );
-      setResumeText(PDFText);
-    };
-    getResumeBuffer();
-  }, [resumeFile]);
-
-  console.log(resumeText);
-
   return (
     <div className="w-[65%] min-h-full border bg-secondary-light flex rounded-xl overflow-auto p-4 flex-col max-h-fit gap-4">
       <div className="flex-col flex h-fit gap-4">

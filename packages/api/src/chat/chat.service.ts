@@ -24,8 +24,7 @@ export class ChatService {
   ) {}
 
   async getChatbot(threadId: string, resume: Resume, jobDescriptionUrl: string, websocket: Socket): Promise<ChatBot> {
-    let resumeText = await this.resumeService.parseResumeText(resume);
-    websocket.emit(WebsocketEvents.Resume.ProcessingComplete);
+    let { textContent: resumeText } = resume;
     const jobDescription = await this.jobDescriptionService.parseJobDescription(jobDescriptionUrl);
     websocket.emit(WebsocketEvents.JobDescription.ProcessingComplete);
     const llm = new ChatOpenAI({

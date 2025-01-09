@@ -9,6 +9,8 @@ import ResumeEditor, {
   ResumeUpdate,
 } from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
 import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
+import { getPDFText } from "@resume-optimizer/ui/utils/pdf-utils";
+import { Buffer } from "buffer";
 
 const ChatPage = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -21,15 +23,23 @@ const ChatPage = () => {
   const [socket, setSocket] = useState<Socket>();
   const [error, setError] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const [resumeText, setResumeText] = useState<string[]>();
+
+  useEffect(() => {
+    if (!resumeFile) return;
+    const getResumeBuffer = async () => {
+      const resumeBuffer = await resumeFile.arrayBuffer();
+      const PDFText = await getPDFText(Buffer.from(resumeBuffer)).then((text) =>
+        text.map((content) => content.replace(/●/g, "•"))
+      );
+      setResumeText(PDFText);
+    };
+    getResumeBuffer();
+  }, [resumeFile]);
 
   useEffect(() => {
     if (!socket) return;
 
-    const onResumeProcessingComplete = () =>
-      setCompletedSteps((prev) => [
-        ...prev,
-        ProgressCardStepEnum.ProcessingResume,
-      ]);
     const onJobDescriptionProcessingComplete = () =>
       setCompletedSteps((prev) => [
         ...prev,
@@ -45,10 +55,6 @@ const ChatPage = () => {
     };
 
     socket.on(
-      WebsocketEvents.Resume.ProcessingComplete,
-      onResumeProcessingComplete
-    );
-    socket.on(
       WebsocketEvents.JobDescription.ProcessingComplete,
       onJobDescriptionProcessingComplete
     );
@@ -61,14 +67,9 @@ const ChatPage = () => {
 
     return () => {
       socket.off(
-        WebsocketEvents.Resume.ProcessingComplete,
-        onResumeProcessingComplete
-      );
-      socket.off(
         WebsocketEvents.JobDescription.ProcessingComplete,
         onJobDescriptionProcessingComplete
       );
-      socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
       socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
       socket.off(WebsocketEvents.Error.ConnectError, onError);
       socket.off(WebsocketEvents.Error.Error, onError);
@@ -79,9 +80,10 @@ const ChatPage = () => {
   }, [socket]);
 
   const uploadResume = async () => {
-    if (!resumeFile) return;
+    if (!resumeFile || !resumeText) return;
     const payload = new FormData();
     payload.append("file", resumeFile);
+    payload.append("textContent", resumeText.join("\n"));
     return axiosClient
       .post("resume/upload", payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -133,7 +135,7 @@ const ChatPage = () => {
       />
       <div className="h-full w-full flex bg-surface justify-center">
         <div className="container h-full w-full bg-background border flex justify-between p-5 gap-5">
-          <ResumeEditor resumeUpdates={resumeUpdates} resumeFile={resumeFile} />
+          <ResumeEditor resumeUpdates={resumeUpdates} resumeText={resumeText} />
           <ChatBox socket={socket} />
         </div>
       </div>

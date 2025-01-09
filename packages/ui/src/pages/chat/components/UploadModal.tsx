@@ -18,7 +18,6 @@ export interface ProgressCardProps {
 
 const PROGRESS_CARD_STEPS = [
   ProgressCardStepEnum.UploadingResume,
-  ProgressCardStepEnum.ProcessingResume,
   ProgressCardStepEnum.ProcessingJobDescription,
   ProgressCardStepEnum.Analyzing,
 ];

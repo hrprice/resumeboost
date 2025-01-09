@@ -10,6 +10,10 @@ import { JobDescriptionModule } from './job-description/job-description.module';
 import configuration from './config/configuration';
 import { ChatModule } from './chat/chat.module';
 import { LlmModule } from './llm/llm.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ContextInterceptor } from './context/context.interceptor';
+import { ContextModule } from './context/context.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -46,7 +50,16 @@ import { LlmModule } from './llm/llm.module';
     ResumeModule,
     JobDescriptionModule,
     LlmModule,
-    ChatModule
-  ]
+    ChatModule,
+    ContextModule,
+    UserModule
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ContextInterceptor
+    }
+  ],
+  exports: [ContextModule]
 })
 export class AppModule {}

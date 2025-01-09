@@ -26,12 +26,13 @@ export class ResumeService {
     return this.bucket;
   }
 
-  async uploadResume(file: Express.Multer.File): Promise<string> {
+  async uploadResume(file: Express.Multer.File, textContent: string): Promise<string> {
     const fileId = await this.resumeModel
       .create({
         fileName: file.originalname,
         size: file.size,
-        mimeType: file.mimetype
+        mimeType: file.mimetype,
+        textContent
       })
       .then(({ _id }) => _id.toString())
       .catch(() => {
@@ -58,7 +59,7 @@ export class ResumeService {
     return fileId;
   }
 
-  async parseResumeText(resume: Resume): Promise<string> {
+  async parseResumeTextOCR(resume: Resume): Promise<string> {
     const bucket = this.getBucket();
     const [buffer] = await bucket.file(resume._id.toString()).download();
 

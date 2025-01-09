@@ -2,6 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  _id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  emailVerified: Boolean!
+}
+
 type Resume {
   _id: ID!
   fileName: String!
@@ -25,5 +33,16 @@ type ParsedJobDescription {
 type Query {
   getResume(resume: String!): Resume!
   getParsedJobDescription(jobUrl: String!): ParsedJobDescription!
-  getJobDescriptionHtml(jobUrl: String!): String!
+  getJobDescriptionContent(jobUrl: String!): String!
+}
+
+type Mutation {
+  registerWithEmailAndPassword(registrationInput: RegistrationInput!): User!
+}
+
+input RegistrationInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
 }

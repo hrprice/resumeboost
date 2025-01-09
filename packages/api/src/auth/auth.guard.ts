@@ -19,6 +19,6 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       return false;
     }
-    return this.authServcice.verifyToken(token);
+    return !!this.authServcice.verifyToken(token);
   }
 }
