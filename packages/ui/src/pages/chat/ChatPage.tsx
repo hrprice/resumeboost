@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import UploadModal from "@resume-optimizer/ui/pages/chat/components/UploadModal";
 import { useSnackbar } from "notistack";
-import axiosClient from "@resume-optimizer/ui/axios-client";
 import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
 import { io, Socket } from "socket.io-client";
 import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox";
@@ -11,6 +10,7 @@ import ResumeEditor, {
 import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
 import { getPDFText } from "@resume-optimizer/ui/utils/pdf-utils";
 import { Buffer } from "buffer";
+import useAxios from "@resume-optimizer/ui/state/use-axios";
 
 const ChatPage = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -24,6 +24,7 @@ const ChatPage = () => {
   const [error, setError] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [resumeText, setResumeText] = useState<string[]>();
+  const axiosClient = useAxios();
 
   useEffect(() => {
     if (!resumeFile) return;
@@ -117,7 +118,7 @@ const ChatPage = () => {
       ...prev,
       ProgressCardStepEnum.UploadingResume,
     ]);
-    connectToSocket(resumeId);
+    // connectToSocket(resumeId);
   };
 
   return (

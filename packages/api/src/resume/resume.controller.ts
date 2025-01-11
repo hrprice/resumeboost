@@ -1,7 +1,9 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResumeService } from './resume.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('resume')
 export class ResumeController {
   constructor(private readonly resumeService: ResumeService) {}
@@ -9,7 +11,6 @@ export class ResumeController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadResume(@UploadedFile() file: Express.Multer.File, @Body('textContent') textContent: string) {
-    console.log(textContent);
     return await this.resumeService.uploadResume(file, textContent);
   }
 }

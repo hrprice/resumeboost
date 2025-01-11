@@ -11,15 +11,17 @@ import { Server, Socket } from 'socket.io';
 import { IsString } from '@nestjs/class-validator';
 import { plainToClass } from '@nestjs/class-transformer';
 import { ChatBot, ChatService } from './chat.service';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { ResumePipe } from '../resume/resume.pipe';
 import { WebsocketEvents } from '@resume-optimizer/shared/socket-constants';
+import { AuthGuard } from '../auth/auth.guard';
 
 class ChatMessageDto {
   @IsString()
   message: string;
 }
 
+@UseGuards(AuthGuard)
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService, private readonly resumePipe: ResumePipe) {}

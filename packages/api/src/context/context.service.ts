@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class Context {
-  private readonly storage = new AsyncLocalStorage<Map<string, any>>();
+  readonly storage = new AsyncLocalStorage<Map<string, any>>();
 
   set(key: string, value: any): void {
     const store = this.storage.getStore();

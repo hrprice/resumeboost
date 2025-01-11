@@ -5,22 +5,25 @@ import { BrowserRouter } from "react-router-dom";
 import BreakpointProvider from "@resume-optimizer/ui/state/BreakpointProvider";
 import NavBar from "@resume-optimizer/ui/components/NavBar";
 import ApolloProviderWrapper from "@resume-optimizer/ui/state/ApolloProviderWrapper";
+import AxiosProvider from "./state/AxiosProvider";
 
 const App = () => {
   return (
     <BrowserRouter>
-      <ApolloProviderWrapper>
-        <BreakpointProvider>
-          <SnackbarProvider>
-            <AuthContextProvider>
-              <div className="relative h-screen flex flex-col">
-                <NavBar />
-                <Routing />
-              </div>
-            </AuthContextProvider>
-          </SnackbarProvider>
-        </BreakpointProvider>
-      </ApolloProviderWrapper>
+      <AuthContextProvider>
+        <ApolloProviderWrapper>
+          <AxiosProvider>
+            <BreakpointProvider>
+              <SnackbarProvider>
+                <div className="relative h-screen flex flex-col">
+                  <NavBar />
+                  <Routing />
+                </div>
+              </SnackbarProvider>
+            </BreakpointProvider>
+          </AxiosProvider>
+        </ApolloProviderWrapper>
+      </AuthContextProvider>
     </BrowserRouter>
   );
 };

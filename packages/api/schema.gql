@@ -12,6 +12,7 @@ type User {
 
 type Resume {
   _id: ID!
+  user: User!
   fileName: String!
   size: Float!
   mimeType: String!

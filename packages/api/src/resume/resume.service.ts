@@ -6,12 +6,14 @@ import { Resume } from './resume.model';
 import { LlmService } from '../llm/llm.service';
 import { Model } from 'mongoose';
 import { UnstructuredLoader } from '@langchain/community/document_loaders/fs/unstructured';
+import { Context } from 'src/context/context.service';
 
 @Injectable()
 export class ResumeService {
   constructor(
     private readonly configService: ConfigService,
     private readonly llmService: LlmService,
+    private readonly context: Context,
     @InjectModel(Resume.name) private resumeModel: Model<Resume>
   ) {}
 
@@ -32,7 +34,8 @@ export class ResumeService {
         fileName: file.originalname,
         size: file.size,
         mimeType: file.mimetype,
-        textContent
+        textContent,
+        user: this.context.get('user')?._id.toString()
       })
       .then(({ _id }) => _id.toString())
       .catch(() => {

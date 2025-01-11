@@ -19,22 +19,28 @@ export class ContextInterceptor implements NestInterceptor {
     const authHeader = request.headers.authorization;
     const token = authHeader?.split(' ')[1];
 
-    this.context.run(async () => {
-      if (token) {
-        try {
-          const decodedToken = await this.authService.verifyToken(token);
-          if (decodedToken) {
-            const user = await this.userService.getUserById(decodedToken.uid);
-            this.context.set('user', user);
+    return new Observable((observer) => {
+      this.context.run(async () => {
+        if (token) {
+          try {
+            const decodedToken = await this.authService.verifyToken(token);
+            if (decodedToken) {
+              const user = await this.userService.getUserById(decodedToken.uid);
+              this.context.set('user', user);
+            } else {
+              this.context.set('user', null);
+            }
+          } catch (err) {
+            console.error('Invalid token:', err.message);
           }
-          this.context.set('user', null);
-        } catch (err) {
-          console.error('Invalid token:', err.message);
         }
-      }
-      return next.handle();
-    });
 
-    return next.handle();
+        next.handle().subscribe({
+          next: (value) => observer.next(value),
+          error: (err) => observer.error(err),
+          complete: () => observer.complete()
+        });
+      });
+    });
   }
 }

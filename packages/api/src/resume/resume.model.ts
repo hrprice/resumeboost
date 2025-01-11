@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { User } from 'src/user/user.model';
+import * as mongoose from 'mongoose';
 
 export type ResumeDocument = HydratedDocument<Resume>;
 
@@ -9,6 +11,10 @@ export type ResumeDocument = HydratedDocument<Resume>;
 export class Resume {
   @Field(() => ID)
   _id: string;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Field(() => User)
+  user: User;
 
   @Prop()
   @Field(() => String)
