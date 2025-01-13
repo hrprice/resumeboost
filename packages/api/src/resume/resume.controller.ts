@@ -11,6 +11,6 @@ export class ResumeController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadResume(@UploadedFile() file: Express.Multer.File, @Body('textContent') textContent: string) {
-    return await this.resumeService.uploadResume(file, textContent);
+    return await this.resumeService.uploadResume(file, JSON.parse(textContent));
   }
 }

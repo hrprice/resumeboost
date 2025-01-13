@@ -16,10 +16,12 @@ type Resume {
   fileName: String!
   size: Float!
   mimeType: String!
-  textContent: String!
+  textContent: [String!]!
 }
 
-type ParsedJobDescription {
+type JobDescription {
+  _id: String!
+  url: String!
   jobTitle: String!
   companyName: String!
   location: String!
@@ -33,7 +35,7 @@ type ParsedJobDescription {
 
 type Query {
   getResume(resume: String!): Resume!
-  getParsedJobDescription(jobUrl: String!): ParsedJobDescription!
+  getParsedJobDescription(jobUrl: String!): JobDescription!
   getJobDescriptionContent(jobUrl: String!): String!
 }
 

@@ -1,35 +1,4 @@
 import { z } from 'zod';
-import { Field, ObjectType } from '@nestjs/graphql';
-
-@ObjectType()
-export class ParsedJobDescription {
-  @Field(() => String)
-  jobTitle: string;
-
-  @Field(() => String)
-  companyName: string;
-
-  @Field(() => String)
-  location: string;
-
-  @Field(() => String, { nullable: true })
-  employmentType?: string | null;
-
-  @Field(() => [String], { nullable: true })
-  responsibilities?: string[] | null;
-
-  @Field(() => [String], { nullable: true })
-  requirements?: string[] | null;
-
-  @Field(() => [String], { nullable: true })
-  preferredQualifications?: string[] | null;
-
-  @Field(() => [String], { nullable: true })
-  benefits?: string[] | null;
-
-  @Field(() => [String], { nullable: true })
-  keywords?: string[] | null;
-}
 
 export const JobDescriptionParsingSchema = z
   .object({

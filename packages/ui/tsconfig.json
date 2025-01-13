@@ -29,6 +29,6 @@
     "watchFile": "usefsevents",
     "fallbackPolling": "dynamicPriority"
   },
-  "include": ["src"],
+  "include": ["src", "../api/src/utils/resume-utils.ts"],
   "exclude": ["node_modules"]
 }

@@ -6,7 +6,7 @@ import { Resume } from './resume.model';
 @Injectable()
 export class ResumePipe implements PipeTransform {
   constructor(@InjectModel(Resume.name) private readonly resumeModel: Model<Resume>) {}
-  async transform(resumeId: string): Promise<Resume | null> {
+  async transform(resumeId: string): Promise<Resume> {
     const document = await this.resumeModel.findById(resumeId).catch(() => {
       throw new NotFoundException();
     });

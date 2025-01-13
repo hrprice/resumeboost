@@ -1,16 +1,16 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { JobDescriptionService } from './job-description.service';
-import { ParsedJobDescription } from './job-description.dto';
+import { JobDescription } from './job-description.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthGuard)
-@Resolver(() => ParsedJobDescription)
+@Resolver(() => JobDescription)
 export class JobDescriptionResolver {
   constructor(private readonly jobDescriptionService: JobDescriptionService) {}
 
-  @Query(() => ParsedJobDescription)
-  async getParsedJobDescription(@Args('jobUrl') jobUrl: string): Promise<ParsedJobDescription> {
+  @Query(() => JobDescription)
+  async getParsedJobDescription(@Args('jobUrl') jobUrl: string): Promise<JobDescription> {
     return this.jobDescriptionService.parseJobDescription(jobUrl);
   }
 

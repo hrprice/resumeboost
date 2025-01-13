@@ -1,45 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import UploadModal from "@resume-optimizer/ui/pages/chat/components/UploadModal";
 import { useSnackbar } from "notistack";
 import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
-import { io, Socket } from "socket.io-client";
 import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox";
-import ResumeEditor, {
+import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
+import {
   ResumeUpdate,
-} from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
+  TextContent,
+} from "@resume-optimizer/shared/socket-constants";
 import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
 import { getPDFText } from "@resume-optimizer/ui/utils/pdf-utils";
 import { Buffer } from "buffer";
 import useAxios from "@resume-optimizer/ui/state/use-axios";
+import useSocketIo from "@resume-optimizer/ui/state/use-socket-io";
 
 const ChatPage = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [uploadModalOpen, setUploadModalOpen] = useState(true);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [jobUrl, setJobUrl] = useState<string>("");
   const [completedSteps, setCompletedSteps] = useState<ProgressCardStepEnum[]>(
     []
   );
-  const [resumeUpdates, setResumeUpdates] = useState<ResumeUpdate[]>([]);
-  const [socket, setSocket] = useState<Socket>();
   const [error, setError] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [resumeText, setResumeText] = useState<string[]>();
+  const [resumeTextContent, setResumeTextContent] = useState<TextContent[][]>(
+    []
+  );
   const axiosClient = useAxios();
-
-  useEffect(() => {
-    if (!resumeFile) return;
-    const getResumeBuffer = async () => {
-      const resumeBuffer = await resumeFile.arrayBuffer();
-      const PDFText = await getPDFText(Buffer.from(resumeBuffer)).then((text) =>
-        text.map((content) => content.replace(/●/g, "•"))
-      );
-      setResumeText(PDFText);
-    };
-    getResumeBuffer();
-  }, [resumeFile]);
+  const socket = useSocketIo();
 
   useEffect(() => {
     if (!socket) return;
+
+    socket.connect();
 
     const onJobDescriptionProcessingComplete = () =>
       setCompletedSteps((prev) => [
@@ -48,13 +41,20 @@ const ChatPage = () => {
       ]);
     const onAnalyzingComplete = () =>
       setCompletedSteps((prev) => [...prev, ProgressCardStepEnum.Analyzing]);
-    const onError = () => {
+    const onError = (message: string) => {
+      console.error(message);
       setError(true);
     };
-    const onResumeUpdate = (data: ResumeUpdate) => {
-      setResumeUpdates((prev) => [...prev, data]);
+    const onResumeUpdate = (data: TextContent[][]) =>
+      setResumeTextContent(data);
+    const onNoActiveConversation = () => {
+      setUploadModalOpen(true);
     };
 
+    socket.on(
+      WebsocketEvents.Chat.NoActiveConversationFound,
+      onNoActiveConversation
+    );
     socket.on(
       WebsocketEvents.JobDescription.ProcessingComplete,
       onJobDescriptionProcessingComplete
@@ -62,29 +62,32 @@ const ChatPage = () => {
     socket.on(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
     socket.on(WebsocketEvents.Resume.Update, onResumeUpdate);
 
-    socket.on(WebsocketEvents.Error.ConnectError, onError);
     socket.on(WebsocketEvents.Error.Error, onError);
-    socket.on(WebsocketEvents.Error.ReconnectError, onError);
 
     return () => {
+      socket.off(
+        WebsocketEvents.Chat.NoActiveConversationFound,
+        onNoActiveConversation
+      );
       socket.off(
         WebsocketEvents.JobDescription.ProcessingComplete,
         onJobDescriptionProcessingComplete
       );
       socket.off(WebsocketEvents.Chat.AnalyzingComplete, onAnalyzingComplete);
-      socket.off(WebsocketEvents.Error.ConnectError, onError);
+      // socket.off(WebsocketEvents.Error.ConnectError, onError);
       socket.off(WebsocketEvents.Error.Error, onError);
-      socket.off(WebsocketEvents.Error.ReconnectError, onError);
+      // socket.off(WebsocketEvents.Error.ReconnectError, onError);
       socket.off(WebsocketEvents.Resume.Update, onResumeUpdate);
-      socket.close();
+      socket.disconnect();
     };
   }, [socket]);
 
-  const uploadResume = async () => {
-    if (!resumeFile || !resumeText) return;
+  const uploadResume = useCallback(async () => {
+    if (!resumeFile) return;
+    const resumeText = await getPDFText(resumeFile);
     const payload = new FormData();
     payload.append("file", resumeFile);
-    payload.append("textContent", resumeText.join("\n"));
+    payload.append("textContent", JSON.stringify(resumeText));
     return axiosClient
       .post("resume/upload", payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -97,29 +100,16 @@ const ChatPage = () => {
           preventDuplicate: true,
         })
       );
-  };
+  }, [axiosClient, enqueueSnackbar, resumeFile]);
 
-  const connectToSocket = (resumeId: string | undefined) => {
-    if (!resumeId || !jobUrl) return;
-    setSocket(
-      io(import.meta.env.VITE_BACKEND_URI, {
-        query: {
-          resumeId,
-          jobUrl,
-        },
-        reconnection: false,
-      })
-    );
-  };
-
-  const handleComplete = async () => {
+  const handleComplete = useCallback(async () => {
     const resumeId = await uploadResume();
     setCompletedSteps((prev) => [
       ...prev,
       ProgressCardStepEnum.UploadingResume,
     ]);
-    // connectToSocket(resumeId);
-  };
+    socket.emit(WebsocketEvents.Chat.StartChat, { jobUrl, resumeId });
+  }, [jobUrl, socket, uploadResume]);
 
   return (
     <div className="relative h-full w-full">
@@ -136,7 +126,7 @@ const ChatPage = () => {
       />
       <div className="h-full w-full flex bg-surface justify-center">
         <div className="container h-full w-full bg-background border flex justify-between p-5 gap-5">
-          <ResumeEditor resumeUpdates={resumeUpdates} resumeText={resumeText} />
+          <ResumeEditor resumeTextContent={resumeTextContent} />
           <ChatBox socket={socket} />
         </div>
       </div>

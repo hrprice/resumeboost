@@ -1,5 +1,10 @@
 import { Socket } from "socket.io-client";
-import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
+import {
+  ChatMessage,
+  ClientToServerEvents,
+  ServerToClientEvents,
+  WebsocketEvents,
+} from "@resume-optimizer/shared/socket-constants";
 import Text from "@resume-optimizer/ui/components/Text";
 import SendIcon from "@material-symbols/svg-400/rounded/arrow_circle_up-fill.svg?react";
 import { useEffect, useRef, useState } from "react";
@@ -7,22 +12,15 @@ import classNames from "classnames";
 import { Fade } from "@mui/material";
 import { LoadingDots } from "../../../components/LoadingDots";
 
-type MessageType = "user" | "chatbot";
-
-interface Message {
-  content: string | undefined;
-  messageType: MessageType;
-}
-
-const MessageBubble = ({ content, messageType }: Message) => {
+const MessageBubble = ({ content, messageType }: ChatMessage) => {
   return (
     <Fade in mountOnEnter={false}>
       <div
         className={classNames(
           "max-w-[300px] min-h-9 px-3 py-1 rounded-xl flex items-center w-fit",
           {
-            "bg-primary-dark rounded-br-none": messageType === "user",
-            "bg-secondary-dark rounded-bl-none": messageType === "chatbot",
+            "bg-primary-dark rounded-br-none": messageType === "human",
+            "bg-secondary-dark rounded-bl-none": messageType === "ai",
           }
         )}
       >
@@ -43,7 +41,7 @@ const MessagesDisplay = ({
   messages,
 }: {
   messageLoading?: boolean;
-  messages: Message[];
+  messages: ChatMessage[];
 }) => {
   return (
     <div className="flex flex-col gap-2 w-full max-h-full">
@@ -51,41 +49,45 @@ const MessagesDisplay = ({
         <div
           key={message.content}
           className={classNames({
-            "self-left": message.messageType === "chatbot",
-            "self-end": message.messageType === "user",
+            "self-left": message.messageType === "ai",
+            "self-end": message.messageType === "human",
           })}
         >
           <MessageBubble {...message} />
         </div>
       ))}
-      {messageLoading && (
-        <MessageBubble content={undefined} messageType="chatbot" />
-      )}
+      {messageLoading && <MessageBubble content="" messageType="ai" />}
     </div>
   );
 };
 
-const ChatBox = ({ socket }: { socket: Socket | undefined }) => {
+const ChatBox = ({
+  socket,
+}: {
+  socket: Socket<ServerToClientEvents, ClientToServerEvents> | undefined;
+}) => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [currentMessage, setCurrentMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     if (!socket) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onChatBotMessage = ({ message }: any) => {
-      setMessages((prev) => [
-        ...prev,
-        { content: message, messageType: "chatbot" },
-      ]);
+
+    const onMessageHistory = (messageHistory: ChatMessage[]) =>
+      setMessages(messageHistory);
+    const onChatBotMessage = (newMessage: ChatMessage) => {
+      setMessages((prev) => [...prev, newMessage]);
       setMessageLoading(false);
     };
     const onResumeUpdate = () => setMessageLoading(false);
+
+    socket.on(WebsocketEvents.Chat.MessageHistory, onMessageHistory);
     socket.on(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
     socket.on(WebsocketEvents.Resume.Update, onResumeUpdate);
 
     return () => {
+      socket.off(WebsocketEvents.Chat.MessageHistory, onMessageHistory);
       socket.off(WebsocketEvents.Chat.ChatBotMessage, onChatBotMessage);
       socket.off(WebsocketEvents.Resume.Update, onResumeUpdate);
     };
@@ -96,13 +98,13 @@ const ChatBox = ({ socket }: { socket: Socket | undefined }) => {
     inputRef.current.setSelectionRange(0, 0);
     inputRef.current.focus();
     setMessageLoading(true);
-    socket?.emit(
-      WebsocketEvents.Chat.UserMessage,
-      JSON.stringify({ message: currentMessage })
-    );
+    socket?.emit(WebsocketEvents.Chat.UserMessage, {
+      content: currentMessage,
+      messageType: "human",
+    });
     setMessages((prev) => [
       ...prev,
-      { content: currentMessage, messageType: "user" },
+      { content: currentMessage, messageType: "human" },
     ]);
     setCurrentMessage("");
   };

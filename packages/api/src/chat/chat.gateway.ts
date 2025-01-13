@@ -1,3 +1,4 @@
+import { AuthService } from './../auth/auth.service';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -8,54 +9,117 @@ import {
   ConnectedSocket
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { IsString } from '@nestjs/class-validator';
-import { plainToClass } from '@nestjs/class-transformer';
 import { ChatBot, ChatService } from './chat.service';
-import { Logger, UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import { ResumePipe } from '../resume/resume.pipe';
-import { WebsocketEvents } from '@resume-optimizer/shared/socket-constants';
-import { AuthGuard } from '../auth/auth.guard';
+import {
+  ChatMessage,
+  ClientToServerEvents,
+  ServerToClientEvents,
+  StartChatData,
+  WebsocketEvents
+} from '@resume-optimizer/shared/socket-constants';
+import { getConversationMessages } from 'src/utils/chatbot-utils';
 
-class ChatMessageDto {
-  @IsString()
-  message: string;
-}
-
-@UseGuards(AuthGuard)
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly chatService: ChatService, private readonly resumePipe: ResumePipe) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly resumePipe: ResumePipe,
+    private readonly authService: AuthService
+  ) {}
 
   @WebSocketServer()
-  private server: Server;
+  private server: Server<ClientToServerEvents, ServerToClientEvents>;
 
   private readonly logger = new Logger(ChatGateway.name);
   private chatBots: Record<string, ChatBot> = {};
+  private connectedUsers: Set<string> = new Set<string>();
 
-  async handleConnection(client: Socket): Promise<void> {
-    this.logger.log(`Client connected: ${client.id}`);
-    const socket = this.server.sockets.sockets.get(client.id);
-    if (!socket) return;
-
-    const { resumeId, jobUrl } = client.handshake.query;
-    if (!jobUrl || !resumeId) return;
-    if (typeof jobUrl !== 'string' || typeof resumeId !== 'string') return;
-
-    const resume = await this.resumePipe.transform(resumeId);
-    if (!resume) return;
-    this.chatBots[client.id] = await this.chatService.getChatbot(client.id, resume, jobUrl, client);
+  async handleConnection(client: Socket<ClientToServerEvents, ServerToClientEvents>): Promise<void> {
+    try {
+      this.logger.log(`Client connected: ${client.id}`);
+      const token = client.handshake.headers.authorization?.split(' ')[1];
+      const userId = (await this.authService.verifyToken(token ?? ''))?.uid;
+      if (!userId) throw new UnauthorizedException();
+      if (this.connectedUsers.has(userId)) throw new UnauthorizedException('user only allowed one active session');
+      this.connectedUsers.add(userId);
+      const existingConversation = await this.chatService.getActiveConversation(userId);
+      if (existingConversation) {
+        const { baseResume, updatedResumeText } = existingConversation;
+        this.chatBots[client.id] = await this.chatService.getChatbot({
+          resume: baseResume,
+          websocket: client,
+          conversation: existingConversation
+        });
+        client.emit(WebsocketEvents.Chat.MessageHistory, getConversationMessages(existingConversation));
+        client.emit(WebsocketEvents.Resume.Update, updatedResumeText);
+      } else {
+        client.emit(WebsocketEvents.Chat.NoActiveConversationFound);
+      }
+    } catch (error: any) {
+      client.emit(WebsocketEvents.Error.Error, error.message);
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket): void {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    delete this.chatBots[client.id];
+  async handleDisconnect(client: Socket<ClientToServerEvents, ServerToClientEvents>): Promise<void> {
+    try {
+      this.logger.log(`Client disconnected: ${client.id}`);
+      const token = client.handshake.headers.authorization?.split(' ')[1];
+      const userId = (await this.authService.verifyToken(token ?? ''))?.uid;
+      if (userId) this.connectedUsers.delete(userId);
+      delete this.chatBots[client.id];
+    } catch (error: any) {
+      client.emit(WebsocketEvents.Error.Error, error.message);
+      client.disconnect();
+    }
+  }
+
+  @SubscribeMessage(WebsocketEvents.Chat.StartChat)
+  async handleNewChat(
+    @MessageBody() data: StartChatData,
+    @ConnectedSocket() client: Socket<ClientToServerEvents, ServerToClientEvents>
+  ): Promise<void> {
+    try {
+      const { resumeId, jobUrl } = data;
+      const resume = await this.resumePipe.transform(resumeId);
+      this.chatBots[client.id] = await this.chatService.getChatbot({
+        resume,
+        jobUrl,
+        websocket: client
+      });
+    } catch (error: any) {
+      client.emit(WebsocketEvents.Error.Error, error.message);
+      client.disconnect();
+    }
   }
 
   @SubscribeMessage(WebsocketEvents.Chat.UserMessage)
-  async handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<void> {
-    const message = plainToClass(ChatMessageDto, JSON.parse(data));
-    this.logger.log(message);
-    const res = await this.chatBots[client.id](message.message);
-    this.server.sockets.sockets.get(client.id)?.emit(WebsocketEvents.Chat.ChatBotMessage, { message: res });
+  async handleMessage(
+    @MessageBody() data: ChatMessage,
+    @ConnectedSocket() client: Socket<ClientToServerEvents, ServerToClientEvents>
+  ): Promise<void> {
+    try {
+      const { content } = data;
+      const res = await this.chatBots[client.id].invoke(content);
+      if (!res) throw new InternalServerErrorException();
+      client.emit(WebsocketEvents.Chat.ChatBotMessage, { messageType: 'ai', content: res?.toString() });
+    } catch (error: any) {
+      client.emit(WebsocketEvents.Error.Error, error.message);
+      client.disconnect();
+    }
+  }
+
+  @SubscribeMessage(WebsocketEvents.Chat.Close)
+  async handleClose(@ConnectedSocket() client: Socket<ClientToServerEvents, ServerToClientEvents>) {
+    try {
+      const { conversationId } = this.chatBots[client.id];
+      await this.chatService.deactivateConversation(conversationId);
+      client.disconnect();
+    } catch (error: any) {
+      client.emit(WebsocketEvents.Error.Error, error.message);
+      client.disconnect();
+    }
   }
 }

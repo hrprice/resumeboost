@@ -6,6 +6,7 @@ import BreakpointProvider from "@resume-optimizer/ui/state/BreakpointProvider";
 import NavBar from "@resume-optimizer/ui/components/NavBar";
 import ApolloProviderWrapper from "@resume-optimizer/ui/state/ApolloProviderWrapper";
 import AxiosProvider from "./state/AxiosProvider";
+import SocketIoProvider from "./state/SocketIoProvider";
 
 const App = () => {
   return (
@@ -13,14 +14,16 @@ const App = () => {
       <AuthContextProvider>
         <ApolloProviderWrapper>
           <AxiosProvider>
-            <BreakpointProvider>
-              <SnackbarProvider>
-                <div className="relative h-screen flex flex-col">
-                  <NavBar />
-                  <Routing />
-                </div>
-              </SnackbarProvider>
-            </BreakpointProvider>
+            <SocketIoProvider>
+              <BreakpointProvider>
+                <SnackbarProvider>
+                  <div className="relative h-screen flex flex-col">
+                    <NavBar />
+                    <Routing />
+                  </div>
+                </SnackbarProvider>
+              </BreakpointProvider>
+            </SocketIoProvider>
           </AxiosProvider>
         </ApolloProviderWrapper>
       </AuthContextProvider>

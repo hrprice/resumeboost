@@ -21,15 +21,14 @@ const getPageText = async (pdf: PDFJS.PDFDocumentProxy, pageNo: number) => {
   return pageText;
 };
 
-export const getPDFText = async (
-  source: Buffer | string
-): Promise<string[]> => {
-  const pdf = await PDFJS.getDocument(source).promise;
+export const getPDFText = async (source: File): Promise<string[]> => {
+  const buffer = await source.arrayBuffer();
+  const pdf = await PDFJS.getDocument(buffer).promise;
   const maxPages = pdf.numPages;
   const pageTextPromises = [];
   for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
     pageTextPromises.push(getPageText(pdf, pageNo));
   }
   const pageTexts = await Promise.all(pageTextPromises);
-  return pageTexts;
+  return pageTexts.map((content) => content.replace(/●/g, "•"));
 };

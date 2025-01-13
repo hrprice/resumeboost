@@ -29,8 +29,8 @@ export class Resume {
   mimeType: string;
 
   @Prop()
-  @Field(() => String)
-  textContent: string;
+  @Field(() => [String])
+  textContent: string[];
 }
 
 export const ResumeSchema = SchemaFactory.createForClass(Resume);

@@ -1,4 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ACCEPTED_RESUME_FILE_TYPES } from '@resume-optimizer/shared/resume-constants';
+import { MAX_RESUME_FILE_SIZE } from '@resume-optimizer/shared/resume-constants';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Bucket, Storage } from '@google-cloud/storage';
 import { InjectModel } from '@nestjs/mongoose';
@@ -28,7 +30,12 @@ export class ResumeService {
     return this.bucket;
   }
 
-  async uploadResume(file: Express.Multer.File, textContent: string): Promise<string> {
+  async uploadResume(file: Express.Multer.File, textContent: string[]): Promise<string> {
+    if (file.size > MAX_RESUME_FILE_SIZE) throw new BadRequestException('file size too large');
+    if (!ACCEPTED_RESUME_FILE_TYPES.includes(file.mimetype))
+      throw new BadRequestException(
+        `Unsupported file type: ${file.mimetype}. Accepted types: ${ACCEPTED_RESUME_FILE_TYPES}`
+      );
     const fileId = await this.resumeModel
       .create({
         fileName: file.originalname,
