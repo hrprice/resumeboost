@@ -239,4 +239,13 @@ export class ChatService {
       isActive: true
     });
   }
+
+  async getAllConversations(userId: string): Promise<Conversation[] | null> {
+    return this.conversationModel
+      .find({ user: userId })
+      .populate('user')
+      .populate('baseResume')
+      .populate('jobDescription')
+      .exec();
+  }
 }

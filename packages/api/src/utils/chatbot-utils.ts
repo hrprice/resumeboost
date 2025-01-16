@@ -19,9 +19,6 @@ export const getConversationMessages = (conversation: Conversation): ChatMessage
         messages.push({ messageType, content: content.toString() });
         continue;
       }
-      default: {
-        continue;
-      }
     }
   }
   return messages;

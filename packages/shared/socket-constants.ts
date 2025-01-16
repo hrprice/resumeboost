@@ -1,4 +1,3 @@
-import { IsEnum, IsString } from "@nestjs/class-validator";
 enum Chat {
   UserMessage = "chat.userMessage",
   ChatBotMessage = "chat.chatBotMessage",
@@ -61,7 +60,6 @@ export interface StartChatData {
 
 export class TextContent {
   content: string;
-
   type: "original" | "updated";
 }
 

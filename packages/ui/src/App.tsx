@@ -17,7 +17,7 @@ const App = () => {
             <SocketIoProvider>
               <BreakpointProvider>
                 <SnackbarProvider>
-                  <div className="relative h-screen flex flex-col">
+                  <div className="grid grid-rows-[min-content_1fr] grid-cols-1 min-h-screen relative">
                     <NavBar />
                     <Routing />
                   </div>

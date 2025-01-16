@@ -57,6 +57,4 @@ To apply, submit your resume and cover letter to [jobs@techcorp.com](mailto:jobs
 \`\`\`
 
 Process the input text accurately and return the job description in the format specified above.
-
-
 `;

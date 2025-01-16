@@ -4,13 +4,9 @@ import { useSnackbar } from "notistack";
 import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
 import ChatBox from "@resume-optimizer/ui/pages/chat/components/ChatBox";
 import ResumeEditor from "@resume-optimizer/ui/pages/chat/components/ResumeEditor";
-import {
-  ResumeUpdate,
-  TextContent,
-} from "@resume-optimizer/shared/socket-constants";
+import { TextContent } from "@resume-optimizer/shared/socket-constants";
 import { WebsocketEvents } from "@resume-optimizer/shared/socket-constants";
 import { getPDFText } from "@resume-optimizer/ui/utils/pdf-utils";
-import { Buffer } from "buffer";
 import useAxios from "@resume-optimizer/ui/state/use-axios";
 import useSocketIo from "@resume-optimizer/ui/state/use-socket-io";
 
@@ -112,7 +108,7 @@ const ChatPage = () => {
   }, [jobUrl, socket, uploadResume]);
 
   return (
-    <div className="relative h-full w-full">
+    <>
       <UploadModal
         open={uploadModalOpen}
         resumeFile={resumeFile}
@@ -124,13 +120,13 @@ const ChatPage = () => {
         error={error}
         close={() => setUploadModalOpen(false)}
       />
-      <div className="h-full w-full flex bg-surface justify-center">
-        <div className="container h-full w-full bg-background border flex justify-between p-5 gap-5">
+      <div className="flex h-screen bg-surface justify-center">
+        <div className="container bg-background border flex justify-between p-5 gap-5">
           <ResumeEditor resumeTextContent={resumeTextContent} />
           <ChatBox socket={socket} />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default ChatPage;

@@ -1,0 +1,13 @@
+query getAllConversations {
+  getAllConversations {
+    jobDescription {
+      jobTitle
+      companyName
+      location
+      employmentType
+      url
+      jobId: _id
+    }
+    isActive
+  }
+}

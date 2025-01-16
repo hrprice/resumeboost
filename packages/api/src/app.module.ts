@@ -14,6 +14,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ContextInterceptor } from './context/context.interceptor';
 import { ContextModule } from './context/context.module';
 import { UserModule } from './user/user.module';
+import GraphQLJSON from 'graphql-type-json';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { UserModule } from './user/user.module';
         federation: 2,
         path: 'schema.gql'
       },
-      driver: ApolloFederationDriver
+      driver: ApolloFederationDriver,
+      resolvers: { JSON: GraphQLJSON }
     }),
     ConfigModule.forRoot({
       isGlobal: true,

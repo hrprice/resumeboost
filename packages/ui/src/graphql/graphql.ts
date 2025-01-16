@@ -14,9 +14,38 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
+  JSON: { input: any; output: any; }
   _Any: { input: any; output: any; }
   federation__FieldSet: { input: any; output: any; }
   link__Import: { input: any; output: any; }
+};
+
+export type Conversation = {
+  __typename?: 'Conversation';
+  _id: Scalars['String']['output'];
+  baseResume: Resume;
+  isActive: Scalars['Boolean']['output'];
+  jobDescription: JobDescription;
+  messages: Array<StoredMessageDto>;
+  startTime: Scalars['DateTime']['output'];
+  updatedResumeText: Array<Array<TextContentDto>>;
+  user: User;
+};
+
+export type JobDescription = {
+  __typename?: 'JobDescription';
+  _id: Scalars['String']['output'];
+  benefits?: Maybe<Array<Scalars['String']['output']>>;
+  companyName: Scalars['String']['output'];
+  employmentType?: Maybe<Scalars['String']['output']>;
+  jobTitle: Scalars['String']['output'];
+  keywords?: Maybe<Array<Scalars['String']['output']>>;
+  location: Scalars['String']['output'];
+  preferredQualifications?: Maybe<Array<Scalars['String']['output']>>;
+  requirements?: Maybe<Array<Scalars['String']['output']>>;
+  responsibilities?: Maybe<Array<Scalars['String']['output']>>;
+  url: Scalars['String']['output'];
 };
 
 export type Mutation = {
@@ -29,24 +58,12 @@ export type MutationRegisterWithEmailAndPasswordArgs = {
   registrationInput: RegistrationInput;
 };
 
-export type ParsedJobDescription = {
-  __typename?: 'ParsedJobDescription';
-  benefits?: Maybe<Array<Scalars['String']['output']>>;
-  companyName: Scalars['String']['output'];
-  employmentType?: Maybe<Scalars['String']['output']>;
-  jobTitle: Scalars['String']['output'];
-  keywords?: Maybe<Array<Scalars['String']['output']>>;
-  location: Scalars['String']['output'];
-  preferredQualifications?: Maybe<Array<Scalars['String']['output']>>;
-  requirements?: Maybe<Array<Scalars['String']['output']>>;
-  responsibilities?: Maybe<Array<Scalars['String']['output']>>;
-};
-
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
+  getAllConversations: Array<Conversation>;
   getJobDescriptionContent: Scalars['String']['output'];
-  getParsedJobDescription: ParsedJobDescription;
+  getParsedJobDescription: JobDescription;
   getResume: Resume;
 };
 
@@ -78,7 +95,31 @@ export type Resume = {
   fileName: Scalars['String']['output'];
   mimeType: Scalars['String']['output'];
   size: Scalars['Float']['output'];
-  textContent: Scalars['String']['output'];
+  textContent: Array<Scalars['String']['output']>;
+  user: User;
+};
+
+export type StoredMessageDataDto = {
+  __typename?: 'StoredMessageDataDto';
+  additional_kwargs: Scalars['JSON']['output'];
+  content: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  response_metadata: Scalars['JSON']['output'];
+  role: Scalars['String']['output'];
+  tool_call_id: Scalars['String']['output'];
+};
+
+export type StoredMessageDto = {
+  __typename?: 'StoredMessageDto';
+  data: StoredMessageDataDto;
+  type: Scalars['String']['output'];
+};
+
+export type TextContentDto = {
+  __typename?: 'TextContentDto';
+  content: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type User = {

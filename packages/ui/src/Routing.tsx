@@ -6,6 +6,8 @@ import Login from "@resume-optimizer/ui/pages/auth/Login";
 import HomePage from "@resume-optimizer/ui/pages/home/HomePage";
 import ChatPage from "@resume-optimizer/ui/pages/chat/ChatPage";
 import Signup from "@resume-optimizer/ui/pages/auth/Signup";
+import JobsPage from "@resume-optimizer/ui/pages/jobs/JobsPage";
+import JobDetailsPage from "@resume-optimizer/ui/pages/jobs/JobDetailsPage";
 
 const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthContext();
@@ -23,9 +25,46 @@ const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
 const Routing = () => {
   return (
     <Routes>
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/chat" element={<ChatPage />} />
+      <Route
+        path="/signup"
+        element={
+          <AuthenticatedRoute>
+            <Signup />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <AuthenticatedRoute>
+            <Login />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <AuthenticatedRoute>
+            <ChatPage />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/jobs"
+        element={
+          <AuthenticatedRoute>
+            <JobsPage />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/jobs/:jobId"
+        element={
+          <AuthenticatedRoute>
+            <JobDetailsPage />
+          </AuthenticatedRoute>
+        }
+      />
       {/* <Route path="/verify-email" element={<VerifyEmail />} /> */}
       <Route
         path="/"

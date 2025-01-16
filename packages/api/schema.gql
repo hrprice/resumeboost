@@ -33,10 +33,52 @@ type JobDescription {
   keywords: [String!]
 }
 
+type TextContentDto {
+  content: String!
+  type: String!
+}
+
+type StoredMessageDataDto {
+  content: String!
+  role: String!
+  name: String!
+  tool_call_id: String!
+  additional_kwargs: JSON!
+  response_metadata: JSON!
+  id: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type StoredMessageDto {
+  type: String!
+  data: StoredMessageDataDto!
+}
+
+type Conversation {
+  _id: String!
+  user: User!
+  baseResume: Resume!
+  updatedResumeText: [[TextContentDto!]!]!
+  jobDescription: JobDescription!
+  startTime: DateTime!
+  messages: [StoredMessageDto!]!
+  isActive: Boolean!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getResume(resume: String!): Resume!
   getParsedJobDescription(jobUrl: String!): JobDescription!
   getJobDescriptionContent(jobUrl: String!): String!
+  getAllConversations: [Conversation!]!
 }
 
 type Mutation {

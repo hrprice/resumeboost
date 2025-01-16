@@ -8,10 +8,12 @@ import {
   User,
 } from "firebase/auth";
 import { AuthContext } from "@resume-optimizer/ui/state/auth-context";
+import { useNavigate } from "react-router-dom";
 
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const app = initializeApp({
     apiKey: import.meta.env.VITE_GCP_API_KEY,
@@ -37,8 +39,8 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const logout = useCallback(async () => {
-    await signOut(auth);
-  }, [auth]);
+    await signOut(auth).then(() => navigate("/login"));
+  }, [auth, navigate]);
 
   return (
     !loading && (

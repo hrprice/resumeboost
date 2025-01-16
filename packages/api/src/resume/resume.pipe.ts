@@ -7,9 +7,12 @@ import { Resume } from './resume.model';
 export class ResumePipe implements PipeTransform {
   constructor(@InjectModel(Resume.name) private readonly resumeModel: Model<Resume>) {}
   async transform(resumeId: string): Promise<Resume> {
-    const document = await this.resumeModel.findById(resumeId).catch(() => {
-      throw new NotFoundException();
-    });
+    const document = await this.resumeModel
+      .findById(resumeId)
+      .populate('user')
+      .catch(() => {
+        throw new NotFoundException();
+      });
     if (!document) throw new NotFoundException();
     return document;
   }

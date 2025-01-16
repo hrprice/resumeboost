@@ -11,6 +11,7 @@ import { Conversation, ConversationSchema } from './chat.model';
 import { ContextModule } from 'src/context/context.module';
 import { UserModule } from 'src/user/user.module';
 import { JobDescription, JobDescriptionSchema } from 'src/job-description/job-description.model';
+import { ChatResolver } from './chat.resolver';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { JobDescription, JobDescriptionSchema } from 'src/job-description/job-de
     AuthModule,
     ContextModule
   ],
-  providers: [ChatGateway, ChatService, JobDescriptionService]
+  providers: [ChatGateway, ChatService, JobDescriptionService, ChatResolver]
 })
 export class ChatModule {}

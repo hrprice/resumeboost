@@ -45,7 +45,7 @@ const Login = () => {
         />
         <input
           className="border-[2px] border-primary-light focus:outline-none h-10 rounded-md focus:border-primary-dark px-2"
-          type="text"
+          type="password"
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
