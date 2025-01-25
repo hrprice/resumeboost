@@ -11,11 +11,13 @@ import {
 } from "@resume-optimizer/ui/graphql/onboarding/onboarding";
 import { OnboardingStep } from "../graphql/graphql";
 import { useErrorBoundary } from "react-error-boundary";
+import { useAuthContext } from "./use-auth-context";
 
 const OnboardingProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuthContext();
   const [popoverStates, setPopoverStates] =
     useState<OnboardingPopoverStatesRecord>(BASE_ONBOARDING_POPOVER_STATES);
-  const { data, loading, error } = useGetOnboardingStepQuery();
+  const { data, loading, error } = useGetOnboardingStepQuery({ skip: !user });
   const [updateOnboardingStepMutation] = useUpdateOnboardingStepMutation();
   const [currentStep, setCurrentStep] = useState<OnboardingStep | undefined>(
     data?.getOnboardingStep.onboardingStep
@@ -39,7 +41,7 @@ const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     [updateOnboardingStepMutation]
   );
 
-  if (!currentStep || !open) return children;
+  if (!currentStep || !open || !user) return children;
 
   if (loading)
     return <CircularProgressBox wrapperClassName="w-screen h-screen" />;

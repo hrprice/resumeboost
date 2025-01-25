@@ -20,7 +20,6 @@ const AxiosProvider = ({ children }: { children: ReactNode }) => {
         return config;
       });
     };
-
     attachTokenInterceptor();
   }, [user]);
 

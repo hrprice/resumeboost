@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import CircularProgressBox from "../components/CircularProgressBox";
 
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [userState, setUserState] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   // Firebase stores the auth state in localstorage by default
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
+      setUserState(user);
       setLoading(false);
     });
     return () => unsubscribe();
@@ -34,7 +34,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const login = useCallback(
     async (email: string, password: string) => {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
-      setUser(user);
+      setUserState(user);
     },
     [auth]
   );
@@ -46,7 +46,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   return loading ? (
     <CircularProgressBox wrapperClassName="h-screen" />
   ) : (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user: userState, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
