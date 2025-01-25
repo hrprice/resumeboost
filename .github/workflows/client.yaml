@@ -47,6 +47,7 @@ jobs:
           VITE_WEBSOCKET_URI: ${{ secrets.VITE_WEBSOCKET_URI }}
           VITE_GCP_API_KEY: ${{ secrets.VITE_GCP_API_KEY }}
           VITE_AUTH_DOMAIN: ${{ secrets.VITE_AUTH_DOMAIN }}
+          VITE_GCP_REDIRECT_URI: ${{ secrets.VITE_GCP_REDIRECT_URI }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
