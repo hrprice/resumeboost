@@ -1,4 +1,4 @@
-import { ResumeUpdate, TextContent } from '@resume-optimizer/shared/socket-constants';
+import { ResumeUpdate, TextContent, TextContentType } from '@resume-optimizer/shared/socket-constants';
 
 export const getUpdatedTextContent = (existingContent: TextContent[][], update: ResumeUpdate) => {
   const updated: TextContent[][] = [];
@@ -14,7 +14,7 @@ export const getUpdatedTextContent = (existingContent: TextContent[][], update: 
         const end = item.content.slice(findIdx + find.substring.length);
         current.push(
           { content: beg, type: item.type },
-          { content: replace, type: 'updated' },
+          { content: replace, type: TextContentType.Updated },
           { content: end, type: item.type }
         );
       }

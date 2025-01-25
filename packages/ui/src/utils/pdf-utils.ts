@@ -1,6 +1,5 @@
 import * as PDFJS from "pdfjs-dist";
 import { TextItem } from "pdfjs-dist/types/src/display/api";
-import { Buffer } from "buffer";
 
 // https://stackoverflow.com/questions/40635979/how-to-correctly-extract-text-from-a-pdf-using-pdf-js
 

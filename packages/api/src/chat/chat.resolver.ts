@@ -1,4 +1,4 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { Conversation } from './chat.model';
 import { InternalServerErrorException, NotFoundException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -17,5 +17,14 @@ export class ChatResolver {
     const conversations = await this.chatService.getAllConversations(user._id);
     if (!conversations) throw new NotFoundException();
     return conversations;
+  }
+
+  @Query(() => Conversation)
+  async getConversationById(
+    @Args('conversationId', { type: () => String }) conversationId: string
+  ): Promise<Conversation> {
+    const conversation = await this.chatService.getConversationById(conversationId);
+    if (!conversation) throw new NotFoundException();
+    return conversation;
   }
 }

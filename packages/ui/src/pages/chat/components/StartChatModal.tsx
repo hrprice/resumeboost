@@ -1,13 +1,15 @@
 import { DialogPanel, Dialog, DialogBackdrop } from "@headlessui/react";
 import Text from "@resume-optimizer/ui/components/Text";
-import { useMemo, useRef } from "react";
-import Download from "@material-symbols/svg-400/rounded/download-fill.svg?react";
+import { useEffect, useMemo } from "react";
 import CheckIcon from "@material-symbols/svg-400/rounded/check_circle-fill.svg?react";
 import CancelIcon from "@material-symbols/svg-400/rounded/cancel-fill.svg?react";
-import { CircularProgress, Collapse } from "@mui/material";
+import { CircularProgress, Collapse, MenuItem, Select } from "@mui/material";
 import { twMerge } from "tailwind-merge";
 import { ProgressCardStepEnum } from "@resume-optimizer/ui/pages/chat/constants/chat-constants";
 import OnboardingCarousel from "@resume-optimizer/ui/pages/chat/components/OnboardingCarousel";
+import { useGetAllResumesQuery } from "@resume-optimizer/ui/graphql/resume/resume";
+import CircularProgressBox from "@resume-optimizer/ui/components/CircularProgressBox";
+import ResumeUpload from "@resume-optimizer/ui/pages/chat/components/ResumeUpload";
 
 export interface ProgressCardProps {
   loading: boolean;
@@ -21,48 +23,6 @@ const PROGRESS_CARD_STEPS = [
   ProgressCardStepEnum.ProcessingJobDescription,
   ProgressCardStepEnum.Analyzing,
 ];
-
-const ResumeUpload = ({
-  setResumeFile,
-}: {
-  setResumeFile: (set: File | null) => void;
-}) => {
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const droppedFiles = event.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      setResumeFile(droppedFiles[0]);
-    }
-  };
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  return (
-    <div
-      className="border-dashed cursor-pointer border-[2px] rounded-2xl w-[600px] h-[300px] border-text-muted bg-gray-200 flex items-center justify-center"
-      onDrop={handleDrop}
-      onDragOver={(event) => event.preventDefault()}
-      onClick={() => inputRef.current?.click()}
-    >
-      <input
-        type="file"
-        accept="application/pdf"
-        multiple={false}
-        ref={inputRef}
-        style={{ display: "none" }}
-        onChange={(e) =>
-          setResumeFile(e.target.files ? e.target.files[0] : null)
-        }
-        className="hidden"
-      />
-      <div className="flex flex-col gap-2 items-center">
-        <Download className="fill-text-muted size-20" />
-        <Text variant="subtitle1" className="text-text-muted">
-          Choose a file or drag it here
-        </Text>
-      </div>
-    </div>
-  );
-};
 
 const LoadingCompleteErrorIcon = ({
   loading,
@@ -142,7 +102,7 @@ const ProgressCards = ({
   );
 };
 
-const UploadModal = ({
+const StartChatModal = ({
   open,
   resumeFile,
   setResumeFile,
@@ -154,8 +114,8 @@ const UploadModal = ({
   close,
 }: {
   open: boolean;
-  resumeFile: File | null;
-  setResumeFile: (f: File | null) => void;
+  resumeFile: File | string;
+  setResumeFile: (f: File | string) => void;
   jobUrl: string;
   setJobUrl: (s: string) => void;
   completedSteps: ProgressCardStepEnum[];
@@ -163,6 +123,13 @@ const UploadModal = ({
   close: () => void;
   error: boolean;
 }) => {
+  const { data, loading } = useGetAllResumesQuery();
+  const userResumes = useMemo(() => data?.getAllResumes || [], [data]);
+
+  const resumeName = useMemo(
+    () => (typeof resumeFile === "string" ? resumeFile : resumeFile?.name),
+    [resumeFile]
+  );
   const urlValid = useMemo(
     () =>
       /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(
@@ -171,19 +138,47 @@ const UploadModal = ({
     [jobUrl]
   );
 
+  useEffect(() => {
+    if (!userResumes.length) return;
+    setResumeFile(userResumes[0].resumeId);
+  }, [setResumeFile, userResumes]);
+
   const carouselPages = [
     {
       content: (
-        <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-start justify-center flex-col gap-4">
+          {!!userResumes.length && (
+            <div className="flex-col gap-3 flex">
+              <Text variant="h6" className="text-secondary-default">
+                Select a resume
+              </Text>
+              <Select
+                onChange={(e) => setResumeFile(e.target.value)}
+                value={resumeFile}
+              >
+                {userResumes.map(({ fileName, resumeId }) => (
+                  <MenuItem
+                    className="border rounded-lg w-full h-fit border-text-muted bg-gray-200 flex items-center justify-between px-2"
+                    key={fileName}
+                    value={resumeId}
+                  >
+                    {fileName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+          )}
           <div className="flex-col gap-3 flex">
             <Text variant="h6" className="text-secondary-default">
-              Upload your resume
+              {userResumes.length
+                ? "Or upload a new one"
+                : "Upload your resume"}
             </Text>
             <ResumeUpload setResumeFile={setResumeFile} />
-            {resumeFile && (
+            {resumeFile && typeof resumeFile !== "string" && (
               <div className="border rounded-lg w-full h-fit border-text-muted bg-gray-200 flex items-center justify-between px-2">
                 <Text variant="subtitle2" className="text-text-muted">
-                  {resumeFile.name}
+                  {resumeName}
                 </Text>
               </div>
             )}
@@ -225,12 +220,12 @@ const UploadModal = ({
         </div>
       ),
       stepComplete: false,
-      onCancel: () => console.log("cancel"),
+      // TODO add logic to interrupt the process if the user goes back
     },
   ];
 
   return (
-    <Dialog open={open} className="relative z-50" onClose={() => {}}>
+    <Dialog open={open} className="relative z-10" onClose={() => {}}>
       <DialogBackdrop className="fixed inset-0 bg-secondary-dark/30 backdrop-blur-lg" />
       <div className="fixed inset-0 flex w-screen items-center justify-center">
         <DialogPanel className="relative w-[750px] h-[625px] border-2 border-primary-light bg-background rounded-[20px] p-2">
@@ -240,10 +235,14 @@ const UploadModal = ({
           >
             Get Started
           </Text>
-          <OnboardingCarousel pages={carouselPages} />
+          {loading ? (
+            <CircularProgressBox />
+          ) : (
+            <OnboardingCarousel pages={carouselPages} />
+          )}
         </DialogPanel>
       </div>
     </Dialog>
   );
 };
-export default UploadModal;
+export default StartChatModal;

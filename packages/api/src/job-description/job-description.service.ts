@@ -58,4 +58,8 @@ export class JobDescriptionService {
     if (!doc) throw new InternalServerErrorException();
     return doc;
   }
+
+  async getJobDescriptionById(id: string): Promise<JobDescription | null> {
+    return this.jobDescriptionModel.findById(id);
+  }
 }

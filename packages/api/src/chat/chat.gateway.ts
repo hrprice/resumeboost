@@ -46,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.connectedUsers.add(userId);
       const existingConversation = await this.chatService.getActiveConversation(userId);
       if (existingConversation) {
-        const { baseResume, updatedResumeText } = existingConversation;
+        const { baseResume, updatedResumeText, jobDescription } = existingConversation;
         this.chatBots[client.id] = await this.chatService.getChatbot({
           resume: baseResume,
           websocket: client,
@@ -54,6 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
         client.emit(WebsocketEvents.Chat.MessageHistory, getConversationMessages(existingConversation));
         client.emit(WebsocketEvents.Resume.Update, updatedResumeText);
+        client.emit(WebsocketEvents.JobDescription.ProcessingComplete, jobDescription);
       } else {
         client.emit(WebsocketEvents.Chat.NoActiveConversationFound);
       }
@@ -116,6 +117,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const { conversationId } = this.chatBots[client.id];
       await this.chatService.deactivateConversation(conversationId);
+      client.emit(WebsocketEvents.Chat.ConversationDeactivated, { conversationId });
       client.disconnect();
     } catch (error: any) {
       client.emit(WebsocketEvents.Error.Error, error.message);

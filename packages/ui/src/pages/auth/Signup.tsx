@@ -9,8 +9,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@resume-optimizer/ui/state/use-auth-context";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [registrationInput, setRegistrationInput] = useState<RegistrationInput>(
-    { email: "", password: "", firstName: "", lastName: "" }
+    {
+      email: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+      registrationSecret: "",
+    }
   );
   const [registerUserMutation, { loading, error }] = useRegisterUserMutation({
     variables: {
@@ -18,13 +26,14 @@ const Signup = () => {
     },
   });
   const [loginLoading, setLoginLoading] = useState(false);
-  const showErrorSnackbar = () =>
-    enqueueSnackbar("Error logging in", {
-      variant: "error",
-      autoHideDuration: 3000,
-    });
-  const navigate = useNavigate();
-  const { login } = useAuthContext();
+  const showErrorSnackbar = useCallback(
+    () =>
+      enqueueSnackbar("Error logging in", {
+        variant: "error",
+        autoHideDuration: 3000,
+      }),
+    []
+  );
   const passwordValid = useMemo(
     () =>
       /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i.test(
@@ -52,14 +61,25 @@ const Signup = () => {
       )
       .then(() => navigate("/"))
       .catch(() => showErrorSnackbar());
-  }, [inputValid, registerUserMutation, login, registrationInput, navigate]);
+  }, [
+    inputValid,
+    registerUserMutation,
+    showErrorSnackbar,
+    login,
+    registrationInput.email,
+    registrationInput.password,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (error) showErrorSnackbar();
-  }, [error]);
+  }, [error, showErrorSnackbar]);
 
   return (
     <div className="w-full h-full flex flex-col items-center gap-4 justify-center">
+      <Text variant="h5" className="text-primary-default font-bold">
+        Create an account
+      </Text>
       <div className="flex flex-col gap-2 w-[300px] max-w-full">
         <input
           className="border-[2px] border-primary-light focus:outline-none h-10 rounded-md focus:border-primary-dark px-2"
@@ -118,6 +138,17 @@ const Signup = () => {
             </Text>
           )}
         </div>
+        <input
+          className="border-[2px] border-primary-light focus:outline-none h-10 rounded-md focus:border-primary-dark px-2"
+          type="text"
+          onChange={(e) =>
+            setRegistrationInput((prev) => ({
+              ...prev,
+              registrationSecret: e.target.value,
+            }))
+          }
+          placeholder="Access Code"
+        />
       </div>
       <div className="flex flex-col justify-center items-center">
         <button

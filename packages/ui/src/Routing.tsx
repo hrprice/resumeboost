@@ -1,13 +1,16 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { ReactNode, useEffect } from "react";
 import { useAuthContext } from "@resume-optimizer/ui/state/use-auth-context";
-import { Typography } from "@mui/material";
+import Text from "@resume-optimizer/ui/components/Text";
 import Login from "@resume-optimizer/ui/pages/auth/Login";
 import HomePage from "@resume-optimizer/ui/pages/home/HomePage";
 import ChatPage from "@resume-optimizer/ui/pages/chat/ChatPage";
 import Signup from "@resume-optimizer/ui/pages/auth/Signup";
 import JobsPage from "@resume-optimizer/ui/pages/jobs/JobsPage";
 import JobDetailsPage from "@resume-optimizer/ui/pages/jobs/JobDetailsPage";
+import { useBreakpoint } from "./state/use-breakpoint";
+import MobileComingSoonPage from "./pages/MobileComingSoonPage";
+import ResumePage from "./pages/resume/ResumePage";
 
 const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthContext();
@@ -19,20 +22,17 @@ const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
     }
   }, [navigate, user]);
 
-  return <>{children}</>;
+  return children;
 };
 
 const Routing = () => {
+  const isMobile = !useBreakpoint("sm");
+
+  if (isMobile) return <MobileComingSoonPage />;
+
   return (
     <Routes>
-      <Route
-        path="/signup"
-        element={
-          <AuthenticatedRoute>
-            <Signup />
-          </AuthenticatedRoute>
-        }
-      />
+      <Route path="/signup" element={<Signup />} />
       <Route
         path="/login"
         element={
@@ -58,10 +58,18 @@ const Routing = () => {
         }
       />
       <Route
-        path="/jobs/:jobId"
+        path="/jobs/:conversationId"
         element={
           <AuthenticatedRoute>
             <JobDetailsPage />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/resume"
+        element={
+          <AuthenticatedRoute>
+            <ResumePage />
           </AuthenticatedRoute>
         }
       />
@@ -76,7 +84,15 @@ const Routing = () => {
       />
       <Route
         path="*"
-        element={<Typography variant="h4">Page Not Found</Typography>}
+        element={
+          <div className="flex justify-center bg-surface">
+            <div className="bg-background container h-full flex items-center justify-center">
+              <Text variant="h4" className="text-primary-default">
+                Page not found
+              </Text>
+            </div>
+          </div>
+        }
       />
     </Routes>
   );

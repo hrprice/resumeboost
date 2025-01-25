@@ -18,4 +18,9 @@ export class JobDescriptionResolver {
   async getJobDescriptionContent(@Args('jobUrl') jobUrl: string): Promise<string> {
     return this.jobDescriptionService.getJobDescriptionHtml(jobUrl);
   }
+
+  @Query(() => JobDescription)
+  async getJobDescription(id: string): Promise<JobDescription | null> {
+    return this.jobDescriptionService.getJobDescriptionById(id);
+  }
 }

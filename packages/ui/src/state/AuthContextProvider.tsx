@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { AuthContext } from "@resume-optimizer/ui/state/auth-context";
 import { useNavigate } from "react-router-dom";
+import CircularProgressBox from "../components/CircularProgressBox";
 
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -42,12 +43,12 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     await signOut(auth).then(() => navigate("/login"));
   }, [auth, navigate]);
 
-  return (
-    !loading && (
-      <AuthContext.Provider value={{ user, login, logout }}>
-        {children}
-      </AuthContext.Provider>
-    )
+  return loading ? (
+    <CircularProgressBox wrapperClassName="h-screen" />
+  ) : (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 

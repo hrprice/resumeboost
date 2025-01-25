@@ -85,4 +85,26 @@ export class ResumeService {
 
     return docs.map(({ pageContent }) => pageContent).join(' ');
   }
+
+  async getAllResumes(userId?: string): Promise<Resume[]> {
+    const id = userId || this.context.get('user')._id;
+    if (!id) throw new InternalServerErrorException();
+    return this.resumeModel
+      .find({ user: { _id: id } })
+      .populate('user')
+      .exec();
+  }
+
+  async deleteResume(resumeId: string): Promise<void> {
+    await this.resumeModel.deleteOne({ _id: resumeId });
+    await this.getBucket().file(resumeId).delete();
+  }
+
+  async getResumeFile(resume: Resume): Promise<Buffer> {
+    const { _id } = resume;
+    const bucket = this.getBucket();
+    const file = bucket.file(_id);
+    const [buffer] = await file.download();
+    return buffer;
+  }
 }

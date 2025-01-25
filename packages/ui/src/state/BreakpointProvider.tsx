@@ -5,11 +5,10 @@ import {
 } from "@resume-optimizer/ui/state/breakpoint-context";
 
 const screenSizes: [number, ScreenSize][] = [
-  [640, "sm"],
-  [768, "md"],
-  [1024, "lg"],
-  [1280, "xl"],
-  [1536, "2xl"],
+  [600, "sm"],
+  [900, "md"],
+  [1200, "lg"],
+  [1536, "xl"],
 ];
 
 const BreakpointProvider = ({ children }: { children: ReactNode }) => {
@@ -18,10 +17,10 @@ const BreakpointProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const handleResize = () => {
       const [, currentBreakpoint] =
-        screenSizes.find(([size]) => size <= window.innerWidth) || [];
-      setBreakpoint(currentBreakpoint || null);
+        screenSizes.find(([size]) => size > window.innerWidth) || [];
+      setBreakpoint(currentBreakpoint || "xl");
     };
-
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => {

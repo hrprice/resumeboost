@@ -23,6 +23,7 @@ import {
   ClientToServerEvents,
   ServerToClientEvents,
   TextContent,
+  TextContentType,
   WebsocketEvents
 } from '@resume-optimizer/shared/socket-constants';
 import { InjectModel } from '@nestjs/mongoose';
@@ -113,7 +114,7 @@ export class ChatService {
   ): Promise<ChatBot> {
     const { textContent: resumeText } = resume;
     const jobDescription = await this.jobDescriptionService.parseJobDescription(jobUrl);
-    websocket.emit(WebsocketEvents.JobDescription.ProcessingComplete);
+    websocket.emit(WebsocketEvents.JobDescription.ProcessingComplete, jobDescription);
 
     const conversation = await this.createConversation(resume, jobDescription);
     const threadId = conversation._id;
@@ -197,7 +198,7 @@ export class ChatService {
     const conversation = await this.conversationModel.create({
       user: resume.user._id,
       baseResume: resume._id,
-      updatedResumeText: resume.textContent.map((page) => [{ content: page, type: 'original' }]),
+      updatedResumeText: resume.textContent.map((page) => [{ content: page, type: TextContentType.Original }]),
       jobDescription: jobDescription._id,
       messages: [],
       isActive: true
@@ -228,21 +229,41 @@ export class ChatService {
     }
   }
 
-  async deactivateConversation(conversationId: string): Promise<void> {
-    await this.conversationModel.findByIdAndUpdate(conversationId, { isActive: false });
-    return;
+  async deactivateConversation(conversationId: string): Promise<Conversation> {
+    const conversation = await this.conversationModel
+      .findByIdAndUpdate(conversationId, { isActive: false })
+      .populate('user')
+      .populate('baseResume')
+      .populate('jobDescription')
+      .exec();
+    if (!conversation) throw new InternalServerErrorException();
+    return conversation;
   }
 
   async getActiveConversation(userId: string): Promise<Conversation | null> {
-    return this.conversationModel.findOne({
-      user: new Types.ObjectId(userId),
-      isActive: true
-    });
+    return this.conversationModel
+      .findOne({
+        user: new Types.ObjectId(userId),
+        isActive: true
+      })
+      .populate('user')
+      .populate('baseResume')
+      .populate('jobDescription')
+      .exec();
   }
 
   async getAllConversations(userId: string): Promise<Conversation[] | null> {
     return this.conversationModel
       .find({ user: userId })
+      .populate('user')
+      .populate('baseResume')
+      .populate('jobDescription')
+      .exec();
+  }
+
+  async getConversationById(id: string): Promise<Conversation | null> {
+    return this.conversationModel
+      .findById(id)
       .populate('user')
       .populate('baseResume')
       .populate('jobDescription')

@@ -1,5 +1,6 @@
 /* Generated File DO NOT EDIT. */
 /* tslint:disable */
+/* eslint-disable */
 import * as Types from '../graphql';
 
 import { gql } from '@apollo/client';

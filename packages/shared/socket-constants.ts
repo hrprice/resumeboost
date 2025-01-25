@@ -6,6 +6,7 @@ enum Chat {
   AnalyzingComplete = "chat.analyzingComplete",
   NoActiveConversationFound = "chat.noActiveConversationFound",
   StartChat = "chat.startChat",
+  ConversationDeactivated = "chat.conversationDeactivated",
 }
 
 enum Resume {
@@ -43,6 +44,20 @@ interface ResultItem {
   range: ResultRange;
 }
 
+export interface iJobDescription {
+  _id: string;
+  url: string;
+  jobTitle: string;
+  companyName: string;
+  location: string;
+  employmentType?: string | null;
+  responsibilities?: string[] | null;
+  requirements?: string[] | null;
+  preferredQualifications?: string[] | null;
+  benefits?: string[] | null;
+  keywords?: string[] | null;
+}
+
 export interface ResumeUpdate {
   find: ResultItem;
   replace: string;
@@ -58,9 +73,14 @@ export interface StartChatData {
   jobUrl: string;
 }
 
+export enum TextContentType {
+  Original = "Original",
+  Updated = "Updated",
+}
+
 export class TextContent {
   content: string;
-  type: "original" | "updated";
+  type: TextContentType;
 }
 
 export interface ServerToClientEvents {
@@ -78,12 +98,17 @@ export interface ServerToClientEvents {
   [WebsocketEvents.Chat.MessageHistory]: (data: ChatMessage[]) => void;
   [WebsocketEvents.Chat.AnalyzingComplete]: () => void;
   [WebsocketEvents.Chat.NoActiveConversationFound]: () => void;
+  [WebsocketEvents.Chat.ConversationDeactivated]: (data: {
+    conversationId: string;
+  }) => void;
 
   // Resume Events
   [WebsocketEvents.Resume.Update]: (content: TextContent[][]) => void;
 
   // Job Description
-  [WebsocketEvents.JobDescription.ProcessingComplete]: () => void;
+  [WebsocketEvents.JobDescription.ProcessingComplete]: (
+    data: iJobDescription
+  ) => void;
 }
 
 export interface ClientToServerEvents {

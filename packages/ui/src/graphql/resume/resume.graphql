@@ -1,0 +1,6 @@
+query GetAllResumes {
+  getAllResumes {
+    resumeId: _id
+    fileName
+  }
+}

@@ -1,0 +1,11 @@
+query getOnboardingStep {
+  getOnboardingStep: getUser {
+    onboardingStep
+  }
+}
+
+mutation updateOnboardingStep($onboardingStep: OnboardingStep!) {
+  updateOnboardingStep(onboardingStep: $onboardingStep) {
+    onboardingStep
+  }
+}

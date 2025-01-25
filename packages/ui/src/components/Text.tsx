@@ -1,5 +1,7 @@
-import { ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
+
+// https://m2.material.io/design/typography/the-type-system.html
 
 type TextVariant =
   | "h1"
@@ -36,13 +38,16 @@ const Text = ({
   children,
   variant = "body1",
   className,
-}: {
+  ...spanProps
+}: HTMLAttributes<HTMLSpanElement> & {
   children: ReactNode;
   variant?: TextVariant;
   className?: string;
 }) => {
   return (
-    <span className={twMerge(TEXT_STYLES[variant], className)}>{children}</span>
+    <span {...spanProps} className={twMerge(TEXT_STYLES[variant], className)}>
+      {children}
+    </span>
   );
 };
 export default Text;

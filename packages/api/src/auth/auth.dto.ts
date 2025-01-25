@@ -15,4 +15,7 @@ export class RegistrationInput {
 
   @Field(() => String)
   lastName: string;
+
+  @Field(() => String)
+  registrationSecret: string;
 }

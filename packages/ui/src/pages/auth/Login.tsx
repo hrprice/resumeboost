@@ -36,6 +36,9 @@ const Login = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center gap-4 justify-center">
+      <Text variant="h5" className="text-primary-default font-bold">
+        Login
+      </Text>
       <div className="flex flex-col gap-2 w-[300px]">
         <input
           className="border-[2px] border-primary-light focus:outline-none h-10 rounded-md focus:border-primary-dark px-2"

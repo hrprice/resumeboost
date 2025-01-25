@@ -1,22 +1,24 @@
-import { TextContent } from '@resume-optimizer/shared/socket-constants';
+import { TextContent, TextContentType } from '@resume-optimizer/shared/socket-constants';
 import { JobDescription } from './../job-description/job-description.model';
 import { StoredMessage, StoredMessageData } from '@langchain/core/messages';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Date, HydratedDocument, Types } from 'mongoose';
 import { Resume } from 'src/resume/resume.model';
 import { User } from 'src/user/user.model';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
 export type ConversationDocument = HydratedDocument<Conversation>;
+
+registerEnumType(TextContentType, { name: 'TextContentType' });
 
 @ObjectType()
 export class TextContentDto {
   @Field(() => String)
   content: string;
 
-  @Field(() => String)
-  type: 'ai' | 'human';
+  @Field(() => TextContentType)
+  type: TextContentType;
 }
 
 @ObjectType()

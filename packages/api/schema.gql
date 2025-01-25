@@ -8,6 +8,16 @@ type User {
   lastName: String!
   email: String!
   emailVerified: Boolean!
+  onboardingStep: OnboardingStep!
+}
+
+enum OnboardingStep {
+  Complete
+  JobsTab
+  ResumeTab
+  ResumeUpdate
+  SendMessage
+  StartChat
 }
 
 type Resume {
@@ -35,7 +45,12 @@ type JobDescription {
 
 type TextContentDto {
   content: String!
-  type: String!
+  type: TextContentType!
+}
+
+enum TextContentType {
+  Original
+  Updated
 }
 
 type StoredMessageDataDto {
@@ -76,13 +91,18 @@ scalar DateTime
 
 type Query {
   getResume(resume: String!): Resume!
+  getAllResumes: [Resume!]!
+  getUser: User!
   getParsedJobDescription(jobUrl: String!): JobDescription!
   getJobDescriptionContent(jobUrl: String!): String!
+  getJobDescription: JobDescription!
   getAllConversations: [Conversation!]!
+  getConversationById(conversationId: String!): Conversation!
 }
 
 type Mutation {
   registerWithEmailAndPassword(registrationInput: RegistrationInput!): User!
+  updateOnboardingStep(onboardingStep: OnboardingStep!): User!
 }
 
 input RegistrationInput {
@@ -90,4 +110,5 @@ input RegistrationInput {
   password: String!
   firstName: String!
   lastName: String!
+  registrationSecret: String!
 }

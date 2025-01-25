@@ -1,5 +1,6 @@
 /* Generated File DO NOT EDIT. */
 /* tslint:disable */
+/* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -51,6 +52,7 @@ export type JobDescription = {
 export type Mutation = {
   __typename?: 'Mutation';
   registerWithEmailAndPassword: User;
+  updateOnboardingStep: User;
 };
 
 
@@ -58,13 +60,36 @@ export type MutationRegisterWithEmailAndPasswordArgs = {
   registrationInput: RegistrationInput;
 };
 
+
+export type MutationUpdateOnboardingStepArgs = {
+  onboardingStep: OnboardingStep;
+};
+
+export enum OnboardingStep {
+  Complete = 'Complete',
+  JobsTab = 'JobsTab',
+  ResumeTab = 'ResumeTab',
+  ResumeUpdate = 'ResumeUpdate',
+  SendMessage = 'SendMessage',
+  StartChat = 'StartChat'
+}
+
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
   getAllConversations: Array<Conversation>;
+  getAllResumes: Array<Resume>;
+  getConversationById: Conversation;
+  getJobDescription: JobDescription;
   getJobDescriptionContent: Scalars['String']['output'];
   getParsedJobDescription: JobDescription;
   getResume: Resume;
+  getUser: User;
+};
+
+
+export type QueryGetConversationByIdArgs = {
+  conversationId: Scalars['String']['input'];
 };
 
 
@@ -87,6 +112,7 @@ export type RegistrationInput = {
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   password: Scalars['String']['input'];
+  registrationSecret: Scalars['String']['input'];
 };
 
 export type Resume = {
@@ -119,8 +145,13 @@ export type StoredMessageDto = {
 export type TextContentDto = {
   __typename?: 'TextContentDto';
   content: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type: TextContentType;
 };
+
+export enum TextContentType {
+  Original = 'Original',
+  Updated = 'Updated'
+}
 
 export type User = {
   __typename?: 'User';
@@ -129,6 +160,7 @@ export type User = {
   emailVerified: Scalars['Boolean']['output'];
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
+  onboardingStep: OnboardingStep;
 };
 
 export type _Service = {

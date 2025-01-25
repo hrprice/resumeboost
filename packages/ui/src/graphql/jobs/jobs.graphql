@@ -6,8 +6,25 @@ query getAllConversations {
       location
       employmentType
       url
-      jobId: _id
     }
     isActive
+    conversationId: _id
+  }
+}
+
+query getConversationById($id: String!) {
+  getConversationById(conversationId: $id) {
+    jobDescription {
+      jobTitle
+      companyName
+      location
+      employmentType
+      url
+      _id
+    }
+    updatedResumeText {
+      content
+      type
+    }
   }
 }
