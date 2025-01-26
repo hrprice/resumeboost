@@ -21,4 +21,4 @@ jobs:
             cd resumeboost
             git fetch
             git reset --hard origin/main
-            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} docker compose up -d --build
+            podman-compose up --build api -d
