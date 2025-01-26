@@ -12,7 +12,7 @@ import { MongooseModule } from '@nestjs/mongoose';
   imports: [
     LlmModule,
     ConfigModule,
-    PlaywrightModule.forRoot(),
+    PlaywrightModule.forRoot({ headless: true, channel: 'chromium' }),
     AuthModule,
     MongooseModule.forFeature([{ name: JobDescription.name, schema: JobDescriptionSchema }])
   ],
