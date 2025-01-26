@@ -7,7 +7,6 @@ import { FirebaseModule } from 'nestjs-firebase';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ResumeModule } from './resume/resume.module';
 import { JobDescriptionModule } from './job-description/job-description.module';
-import configuration from './config/configuration';
 import { ChatModule } from './chat/chat.module';
 import { LlmModule } from './llm/llm.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -27,13 +26,12 @@ import GraphQLJSON from 'graphql-type-json';
       resolvers: { JSON: GraphQLJSON }
     }),
     ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration]
+      isGlobal: true
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.getOrThrow('database.host')
+        uri: configService.getOrThrow('MONGO_URI')
       }),
       inject: [ConfigService]
     }),
@@ -41,9 +39,9 @@ import GraphQLJSON from 'graphql-type-json';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         googleApplicationCredential: {
-          clientEmail: configService.getOrThrow('gcp.clientEmail'),
-          projectId: configService.getOrThrow('gcp.projectId'),
-          privateKey: configService.getOrThrow('gcp.privateKey')
+          clientEmail: configService.getOrThrow('GCP_CLIENT_EMAIL'),
+          projectId: configService.getOrThrow('GCP_PROJECT_ID'),
+          privateKey: configService.getOrThrow('GCP_PRIVATE_KEY')
         }
       }),
       inject: [ConfigService]

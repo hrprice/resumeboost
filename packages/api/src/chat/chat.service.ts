@@ -29,7 +29,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Conversation } from './chat.model';
 import { Model, Types } from 'mongoose';
-import _ from 'lodash';
+import { omit } from 'lodash';
 import { JobDescription } from 'src/job-description/job-description.model';
 import { similarSubstring } from 'src/utils/similar-substring';
 
@@ -124,7 +124,7 @@ export class ChatService {
     const initialMessages = [
       new SystemMessage(CHATBOT_SYSTEM_PROMPT),
       new HumanMessage({ name: 'resume', content: resumeText.join('\n') }),
-      new HumanMessage({ name: 'job_description', content: JSON.stringify(_.omit(jobDescription, ['_id', 'url'])) })
+      new HumanMessage({ name: 'job_description', content: JSON.stringify(omit(jobDescription, ['_id', 'url'])) })
     ];
 
     const initialRes = await app.invoke(
